@@ -1,0 +1,3 @@
+/Users/artemzimin/Documents/LR1_3/DBMS_Lab_Project/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
+/Users/artemzimin/Documents/LR1_3/DBMS_Lab_Project/build/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
+/Users/artemzimin/Documents/LR1_3/DBMS_Lab_Project/build/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir

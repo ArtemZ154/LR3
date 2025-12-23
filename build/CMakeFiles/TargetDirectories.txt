@@ -1,3 +1,0 @@
-/Users/artemzimin/Documents/LR1_2/build/CMakeFiles/LR1_2.dir
-/Users/artemzimin/Documents/LR1_2/build/CMakeFiles/edit_cache.dir
-/Users/artemzimin/Documents/LR1_2/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,6 @@
+DBMS_Lab_Project/build/
+cmake-build-debug/
+.DS_Store
+.idea/
+.vscode/
+*.docx

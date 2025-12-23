@@ -1,5 +1,0 @@
-if(EXISTS "/Users/artemzimin/Documents/LR1_3/DBMS_Lab_Project/build/runTests[1]_tests.cmake")
-  include("/Users/artemzimin/Documents/LR1_3/DBMS_Lab_Project/build/runTests[1]_tests.cmake")
-else()
-  add_test(runTests_NOT_BUILT runTests_NOT_BUILT)
-endif()

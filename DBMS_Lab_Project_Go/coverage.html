@@ -1,0 +1,2512 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>cmd: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">dbms_lab_project/cmd/main.go (0.0%)</option>
+				
+				<option value="file1">dbms_lab_project/internal/datastructures/array.go (85.7%)</option>
+				
+				<option value="file2">dbms_lab_project/internal/datastructures/doubly_linked_list.go (90.0%)</option>
+				
+				<option value="file3">dbms_lab_project/internal/datastructures/full_binary_tree.go (91.3%)</option>
+				
+				<option value="file4">dbms_lab_project/internal/datastructures/hash_table_chaining.go (92.5%)</option>
+				
+				<option value="file5">dbms_lab_project/internal/datastructures/hash_table_open_addr.go (93.5%)</option>
+				
+				<option value="file6">dbms_lab_project/internal/datastructures/lfu_cache.go (93.3%)</option>
+				
+				<option value="file7">dbms_lab_project/internal/datastructures/queue.go (93.3%)</option>
+				
+				<option value="file8">dbms_lab_project/internal/datastructures/set.go (93.8%)</option>
+				
+				<option value="file9">dbms_lab_project/internal/datastructures/singly_linked_list.go (90.8%)</option>
+				
+				<option value="file10">dbms_lab_project/internal/datastructures/stack.go (94.7%)</option>
+				
+				<option value="file11">dbms_lab_project/internal/dbms/command_parser.go (100.0%)</option>
+				
+				<option value="file12">dbms_lab_project/internal/dbms/dbms.go (91.9%)</option>
+				
+				<option value="file13">dbms_lab_project/internal/dbms/storage_manager.go (89.3%)</option>
+				
+				<option value="file14">dbms_lab_project/internal/dbms/tasks.go (93.3%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "bufio"
+        "dbms_lab_project/internal/dbms"
+        "fmt"
+        "os"
+)
+
+func main() <span class="cov0" title="0">{
+        db := dbms.NewDBMS()
+        sm := dbms.NewStorageManager("database.txt")
+
+        if err := sm.Load(db); err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error loading database:", err)
+        }</span>
+
+        <span class="cov0" title="0">scanner := bufio.NewScanner(os.Stdin)
+        for </span><span class="cov0" title="0">{
+                fmt.Print("&gt; ")
+                if !scanner.Scan() </span><span class="cov0" title="0">{
+                        break</span>
+                }
+                <span class="cov0" title="0">line := scanner.Text()
+                if line == "EXIT" </span><span class="cov0" title="0">{
+                        break</span>
+                }
+
+                <span class="cov0" title="0">parts := dbms.Parse(line)
+                result := db.Execute(parts)
+                fmt.Println(result)</span>
+        }
+
+        <span class="cov0" title="0">if err := sm.Save(db); err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error saving database:", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package datastructures
+
+import (
+        "errors"
+        "strings"
+)
+
+type Array struct {
+        data []string
+}
+
+func NewArray() *Array <span class="cov8" title="1">{
+        return &amp;Array{
+                data: make([]string, 0),
+        }
+}</span>
+
+func (a *Array) PushBack(value string) <span class="cov8" title="1">{
+        a.data = append(a.data, value)
+}</span>
+
+func (a *Array) Insert(index int, value string) error <span class="cov8" title="1">{
+        if index &lt; 0 || index &gt; len(a.data) </span><span class="cov8" title="1">{
+                return errors.New("index out of bounds")
+        }</span>
+        <span class="cov8" title="1">if index == len(a.data) </span><span class="cov0" title="0">{
+                a.PushBack(value)
+                return nil
+        }</span>
+        <span class="cov8" title="1">a.data = append(a.data[:index+1], a.data[index:]...)
+        a.data[index] = value
+        return nil</span>
+}
+
+func (a *Array) Get(index int) (string, error) <span class="cov8" title="1">{
+        if index &lt; 0 || index &gt;= len(a.data) </span><span class="cov8" title="1">{
+                return "", errors.New("index out of bounds")
+        }</span>
+        <span class="cov8" title="1">return a.data[index], nil</span>
+}
+
+func (a *Array) Remove(index int) error <span class="cov8" title="1">{
+        if index &lt; 0 || index &gt;= len(a.data) </span><span class="cov8" title="1">{
+                return errors.New("index out of bounds")
+        }</span>
+        <span class="cov8" title="1">a.data = append(a.data[:index], a.data[index+1:]...)
+        return nil</span>
+}
+
+func (a *Array) Set(index int, value string) error <span class="cov8" title="1">{
+        if index &lt; 0 || index &gt;= len(a.data) </span><span class="cov8" title="1">{
+                return errors.New("index out of bounds")
+        }</span>
+        <span class="cov8" title="1">a.data[index] = value
+        return nil</span>
+}
+
+func (a *Array) Size() int <span class="cov8" title="1">{
+        return len(a.data)
+}</span>
+
+func (a *Array) Clear() <span class="cov8" title="1">{
+        a.data = make([]string, 0)
+}</span>
+
+func (a *Array) Serialize() string <span class="cov8" title="1">{
+        return strings.Join(a.data, " ")
+}</span>
+
+func (a *Array) Deserialize(str string) <span class="cov8" title="1">{
+        if str == "" </span><span class="cov0" title="0">{
+                a.data = make([]string, 0)
+                return
+        }</span>
+        <span class="cov8" title="1">a.data = strings.Split(str, " ")</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package datastructures
+
+import (
+        "errors"
+        "strings"
+)
+
+type DNode struct {
+        Value string
+        Next  *DNode
+        Prev  *DNode
+}
+
+type DoublyLinkedList struct {
+        Head  *DNode
+        Tail  *DNode
+        Count int
+}
+
+func NewDoublyLinkedList() *DoublyLinkedList <span class="cov8" title="1">{
+        return &amp;DoublyLinkedList{}
+}</span>
+
+func (l *DoublyLinkedList) PushFront(value string) <span class="cov8" title="1">{
+        newNode := &amp;DNode{Value: value, Next: l.Head}
+        if l.Head != nil </span><span class="cov8" title="1">{
+                l.Head.Prev = newNode
+        }</span> else<span class="cov0" title="0"> {
+                l.Tail = newNode
+        }</span>
+        <span class="cov8" title="1">l.Head = newNode
+        l.Count++</span>
+}
+
+func (l *DoublyLinkedList) PushBack(value string) <span class="cov8" title="1">{
+        newNode := &amp;DNode{Value: value, Prev: l.Tail}
+        if l.Tail != nil </span><span class="cov8" title="1">{
+                l.Tail.Next = newNode
+        }</span> else<span class="cov8" title="1"> {
+                l.Head = newNode
+        }</span>
+        <span class="cov8" title="1">l.Tail = newNode
+        l.Count++</span>
+}
+
+func (l *DoublyLinkedList) PopFront() (string, error) <span class="cov8" title="1">{
+        if l.Head == nil </span><span class="cov0" title="0">{
+                return "", errors.New("list is empty")
+        }</span>
+        <span class="cov8" title="1">val := l.Head.Value
+        l.Head = l.Head.Next
+        if l.Head != nil </span><span class="cov0" title="0">{
+                l.Head.Prev = nil
+        }</span> else<span class="cov8" title="1"> {
+                l.Tail = nil
+        }</span>
+        <span class="cov8" title="1">l.Count--
+        return val, nil</span>
+}
+
+func (l *DoublyLinkedList) PopBack() (string, error) <span class="cov8" title="1">{
+        if l.Tail == nil </span><span class="cov8" title="1">{
+                return "", errors.New("list is empty")
+        }</span>
+        <span class="cov8" title="1">val := l.Tail.Value
+        l.Tail = l.Tail.Prev
+        if l.Tail != nil </span><span class="cov8" title="1">{
+                l.Tail.Next = nil
+        }</span> else<span class="cov8" title="1"> {
+                l.Head = nil
+        }</span>
+        <span class="cov8" title="1">l.Count--
+        return val, nil</span>
+}
+
+func (l *DoublyLinkedList) RemoveValue(value string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == value </span><span class="cov8" title="1">{
+                        if current.Prev != nil </span><span class="cov8" title="1">{
+                                current.Prev.Next = current.Next
+                        }</span> else<span class="cov8" title="1"> {
+                                l.Head = current.Next
+                        }</span>
+                        <span class="cov8" title="1">if current.Next != nil </span><span class="cov8" title="1">{
+                                current.Next.Prev = current.Prev
+                        }</span> else<span class="cov8" title="1"> {
+                                l.Tail = current.Prev
+                        }</span>
+                        <span class="cov8" title="1">l.Count--
+                        return</span>
+                }
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *DoublyLinkedList) Find(value string) bool <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == value </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+func (l *DoublyLinkedList) InsertAfter(targetValue, newValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue </span><span class="cov8" title="1">{
+                        newNode := &amp;DNode{Value: newValue, Next: current.Next, Prev: current}
+                        if current.Next != nil </span><span class="cov8" title="1">{
+                                current.Next.Prev = newNode
+                        }</span> else<span class="cov0" title="0"> {
+                                l.Tail = newNode
+                        }</span>
+                        <span class="cov8" title="1">current.Next = newNode
+                        l.Count++
+                        return</span>
+                }
+                <span class="cov0" title="0">current = current.Next</span>
+        }
+}
+
+func (l *DoublyLinkedList) InsertBefore(targetValue, newValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue </span><span class="cov8" title="1">{
+                        newNode := &amp;DNode{Value: newValue, Next: current, Prev: current.Prev}
+                        if current.Prev != nil </span><span class="cov8" title="1">{
+                                current.Prev.Next = newNode
+                        }</span> else<span class="cov0" title="0"> {
+                                l.Head = newNode
+                        }</span>
+                        <span class="cov8" title="1">current.Prev = newNode
+                        l.Count++
+                        return</span>
+                }
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *DoublyLinkedList) RemoveAfter(targetValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue &amp;&amp; current.Next != nil </span><span class="cov8" title="1">{
+                        toRemove := current.Next
+                        current.Next = toRemove.Next
+                        if toRemove.Next != nil </span><span class="cov8" title="1">{
+                                toRemove.Next.Prev = current
+                        }</span> else<span class="cov0" title="0"> {
+                                l.Tail = current
+                        }</span>
+                        <span class="cov8" title="1">l.Count--
+                        return</span>
+                }
+                <span class="cov0" title="0">current = current.Next</span>
+        }
+}
+
+func (l *DoublyLinkedList) RemoveBefore(targetValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue &amp;&amp; current.Prev != nil </span><span class="cov8" title="1">{
+                        toRemove := current.Prev
+                        if toRemove.Prev != nil </span><span class="cov8" title="1">{
+                                toRemove.Prev.Next = current
+                        }</span> else<span class="cov0" title="0"> {
+                                l.Head = current
+                        }</span>
+                        <span class="cov8" title="1">current.Prev = toRemove.Prev
+                        l.Count--
+                        return</span>
+                }
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *DoublyLinkedList) Size() int <span class="cov0" title="0">{
+        return l.Count
+}</span>
+
+func (l *DoublyLinkedList) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                sb.WriteString(current.Value)
+                if current.Next != nil </span><span class="cov8" title="1">{
+                        sb.WriteString(" ")
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (l *DoublyLinkedList) Deserialize(str string) <span class="cov8" title="1">{
+        l.Head = nil
+        l.Tail = nil
+        l.Count = 0
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.Split(str, " ")
+        for _, p := range parts </span><span class="cov8" title="1">{
+                l.PushBack(p)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package datastructures
+
+import (
+        "strings"
+)
+
+type BTNode struct {
+        Data  string
+        Left  *BTNode
+        Right *BTNode
+}
+
+type FullBinaryTree struct {
+        Root *BTNode
+}
+
+func NewFullBinaryTree() *FullBinaryTree <span class="cov8" title="1">{
+        return &amp;FullBinaryTree{}
+}</span>
+
+func (t *FullBinaryTree) Insert(value string) <span class="cov8" title="1">{
+        if t.Root == nil </span><span class="cov8" title="1">{
+                t.Root = &amp;BTNode{Data: value}
+                return
+        }</span>
+        <span class="cov8" title="1">queue := []*BTNode{t.Root}
+        for len(queue) &gt; 0 </span><span class="cov8" title="1">{
+                current := queue[0]
+                queue = queue[1:]
+
+                if current.Left == nil </span><span class="cov8" title="1">{
+                        current.Left = &amp;BTNode{Data: value}
+                        return
+                }</span> else<span class="cov8" title="1"> {
+                        queue = append(queue, current.Left)
+                }</span>
+
+                <span class="cov8" title="1">if current.Right == nil </span><span class="cov8" title="1">{
+                        current.Right = &amp;BTNode{Data: value}
+                        return
+                }</span> else<span class="cov8" title="1"> {
+                        queue = append(queue, current.Right)
+                }</span>
+        }
+}
+
+func (t *FullBinaryTree) Find(value string) bool <span class="cov8" title="1">{
+        return t.findRecursive(t.Root, value)
+}</span>
+
+func (t *FullBinaryTree) findRecursive(node *BTNode, value string) bool <span class="cov8" title="1">{
+        if node == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">if node.Data == value </span><span class="cov8" title="1">{
+                return true
+        }</span>
+        <span class="cov8" title="1">return t.findRecursive(node.Left, value) || t.findRecursive(node.Right, value)</span>
+}
+
+func (t *FullBinaryTree) IsFull() bool <span class="cov8" title="1">{
+        return t.isFullRecursive(t.Root)
+}</span>
+
+func (t *FullBinaryTree) isFullRecursive(node *BTNode) bool <span class="cov8" title="1">{
+        if node == nil </span><span class="cov0" title="0">{
+                return true
+        }</span>
+        <span class="cov8" title="1">if node.Left == nil &amp;&amp; node.Right == nil </span><span class="cov8" title="1">{
+                return true
+        }</span>
+        <span class="cov8" title="1">if node.Left != nil &amp;&amp; node.Right != nil </span><span class="cov8" title="1">{
+                return t.isFullRecursive(node.Left) &amp;&amp; t.isFullRecursive(node.Right)
+        }</span>
+        <span class="cov8" title="1">return false</span>
+}
+
+func (t *FullBinaryTree) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        t.serializeRecursive(t.Root, 0, &amp;sb)
+        res := sb.String()
+        if len(res) &gt; 0 &amp;&amp; res[len(res)-1] == '|' </span><span class="cov8" title="1">{
+                res = res[:len(res)-1]
+        }</span>
+        <span class="cov8" title="1">return res</span>
+}
+
+func (t *FullBinaryTree) serializeRecursive(node *BTNode, depth int, sb *strings.Builder) <span class="cov8" title="1">{
+        if node == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">sb.WriteString(strings.Repeat(".", depth))
+        sb.WriteString(node.Data)
+        sb.WriteString("|")
+        t.serializeRecursive(node.Left, depth+1, sb)
+        t.serializeRecursive(node.Right, depth+1, sb)</span>
+}
+
+func (t *FullBinaryTree) Deserialize(str string) <span class="cov8" title="1">{
+        t.Root = nil
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">lines := strings.Split(str, "|")
+        if len(lines) == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">t.Root = &amp;BTNode{Data: lines[0]} // First line has 0 dots
+        parentStack := []*BTNode{t.Root}
+
+        for i := 1; i &lt; len(lines); i++ </span><span class="cov8" title="1">{
+                line := lines[i]
+                depth := 0
+                for j := 0; j &lt; len(line); j++ </span><span class="cov8" title="1">{
+                        if line[j] == '.' </span><span class="cov8" title="1">{
+                                depth++
+                        }</span> else<span class="cov8" title="1"> {
+                                break</span>
+                        }
+                }
+                <span class="cov8" title="1">value := line[depth:]
+                newNode := &amp;BTNode{Data: value}
+
+                if depth-1 &lt; 0 || depth-1 &gt;= len(parentStack) </span><span class="cov0" title="0">{
+                        // Should not happen if serialized correctly
+                        continue</span>
+                }
+                <span class="cov8" title="1">parent := parentStack[depth-1]
+
+                if parent.Left == nil </span><span class="cov8" title="1">{
+                        parent.Left = newNode
+                }</span> else<span class="cov0" title="0"> {
+                        parent.Right = newNode
+                }</span>
+
+                <span class="cov8" title="1">if len(parentStack) &lt;= depth </span><span class="cov8" title="1">{
+                        parentStack = append(parentStack, newNode)
+                }</span> else<span class="cov0" title="0"> {
+                        parentStack[depth] = newNode
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package datastructures
+
+import (
+        "errors"
+        "fmt"
+        "strings"
+)
+
+type KV struct {
+        Key   string
+        Value string
+}
+
+type HashTableChaining struct {
+        table    [][]KV
+        capacity int
+}
+
+func NewHashTableChaining(cap int) *HashTableChaining <span class="cov8" title="1">{
+        if cap &lt;= 0 </span><span class="cov0" title="0">{
+                cap = 16
+        }</span>
+        <span class="cov8" title="1">return &amp;HashTableChaining{
+                table:    make([][]KV, cap),
+                capacity: cap,
+        }</span>
+}
+
+func (ht *HashTableChaining) manualHash(key string) int <span class="cov8" title="1">{
+        var hash uint64 = 5381
+        for _, c := range key </span><span class="cov8" title="1">{
+                hash = ((hash &lt;&lt; 5) + hash) + uint64(c)
+        }</span>
+        <span class="cov8" title="1">return int(hash % uint64(ht.capacity))</span>
+}
+
+func (ht *HashTableChaining) Put(key, value string) <span class="cov8" title="1">{
+        idx := ht.manualHash(key)
+        for i, kv := range ht.table[idx] </span><span class="cov8" title="1">{
+                if kv.Key == key </span><span class="cov8" title="1">{
+                        ht.table[idx][i].Value = value
+                        return
+                }</span>
+        }
+        <span class="cov8" title="1">ht.table[idx] = append(ht.table[idx], KV{Key: key, Value: value})</span>
+}
+
+func (ht *HashTableChaining) Get(key string) (string, error) <span class="cov8" title="1">{
+        idx := ht.manualHash(key)
+        for _, kv := range ht.table[idx] </span><span class="cov8" title="1">{
+                if kv.Key == key </span><span class="cov8" title="1">{
+                        return kv.Value, nil
+                }</span>
+        }
+        <span class="cov8" title="1">return "", errors.New("Key not found")</span>
+}
+
+func (ht *HashTableChaining) Remove(key string) <span class="cov8" title="1">{
+        idx := ht.manualHash(key)
+        for i, kv := range ht.table[idx] </span><span class="cov8" title="1">{
+                if kv.Key == key </span><span class="cov8" title="1">{
+                        // Remove element
+                        ht.table[idx] = append(ht.table[idx][:i], ht.table[idx][i+1:]...)
+                        return
+                }</span>
+        }
+}
+
+func (ht *HashTableChaining) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        first := true
+        for _, bucket := range ht.table </span><span class="cov8" title="1">{
+                for _, kv := range bucket </span><span class="cov8" title="1">{
+                        if !first </span><span class="cov0" title="0">{
+                                sb.WriteString(" ")
+                        }</span>
+                        <span class="cov8" title="1">sb.WriteString(fmt.Sprintf("%s:%s", kv.Key, kv.Value))
+                        first = false</span>
+                }
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (ht *HashTableChaining) Deserialize(str string) <span class="cov8" title="1">{
+        // Clear table
+        ht.table = make([][]KV, ht.capacity)
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">pairs := strings.Split(str, " ")
+        for _, p := range pairs </span><span class="cov8" title="1">{
+                kv := strings.SplitN(p, ":", 2)
+                if len(kv) == 2 </span><span class="cov8" title="1">{
+                        ht.Put(kv[0], kv[1])
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package datastructures
+
+import (
+        "errors"
+        "fmt"
+        "strings"
+)
+
+type State int
+
+const (
+        EMPTY State = iota
+        ACTIVE
+        DELETED
+)
+
+type Entry struct {
+        Key   string
+        Value string
+        State State
+}
+
+type HashTableOpenAddr struct {
+        table         []Entry
+        capacity      int
+        numElements   int
+        maxLoadFactor float64
+}
+
+func NewHashTableOpenAddr(cap int) *HashTableOpenAddr <span class="cov8" title="1">{
+        if cap &lt;= 0 </span><span class="cov0" title="0">{
+                cap = 16
+        }</span>
+        <span class="cov8" title="1">return &amp;HashTableOpenAddr{
+                table:         make([]Entry, cap),
+                capacity:      cap,
+                numElements:   0,
+                maxLoadFactor: 0.6,
+        }</span>
+}
+
+func (ht *HashTableOpenAddr) manualHash(key string) int <span class="cov8" title="1">{
+        var hash uint64 = 5381
+        for _, c := range key </span><span class="cov8" title="1">{
+                hash = ((hash &lt;&lt; 5) + hash) + uint64(c)
+        }</span>
+        <span class="cov8" title="1">return int(hash % uint64(ht.capacity))</span>
+}
+
+func (ht *HashTableOpenAddr) rehash() <span class="cov8" title="1">{
+        oldTable := ht.table
+        ht.capacity *= 2
+        ht.table = make([]Entry, ht.capacity)
+        ht.numElements = 0
+
+        for _, entry := range oldTable </span><span class="cov8" title="1">{
+                if entry.State == ACTIVE </span><span class="cov8" title="1">{
+                        ht.Put(entry.Key, entry.Value)
+                }</span>
+        }
+}
+
+func (ht *HashTableOpenAddr) Put(key, value string) <span class="cov8" title="1">{
+        if float64(ht.numElements)/float64(ht.capacity) &gt;= ht.maxLoadFactor </span><span class="cov8" title="1">{
+                ht.rehash()
+        }</span>
+
+        <span class="cov8" title="1">idx := ht.manualHash(key)
+        for i := 0; i &lt; ht.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % ht.capacity
+                if ht.table[probeIdx].State == EMPTY || ht.table[probeIdx].State == DELETED </span><span class="cov8" title="1">{
+                        ht.table[probeIdx] = Entry{Key: key, Value: value, State: ACTIVE}
+                        ht.numElements++
+                        return
+                }</span> else<span class="cov8" title="1"> if ht.table[probeIdx].State == ACTIVE &amp;&amp; ht.table[probeIdx].Key == key </span><span class="cov8" title="1">{
+                        ht.table[probeIdx].Value = value
+                        return
+                }</span>
+        }
+}
+
+func (ht *HashTableOpenAddr) Get(key string) (string, error) <span class="cov8" title="1">{
+        idx := ht.manualHash(key)
+        for i := 0; i &lt; ht.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % ht.capacity
+                if ht.table[probeIdx].State == EMPTY </span><span class="cov8" title="1">{
+                        return "", errors.New("Key not found")
+                }</span>
+                <span class="cov8" title="1">if ht.table[probeIdx].State == ACTIVE &amp;&amp; ht.table[probeIdx].Key == key </span><span class="cov8" title="1">{
+                        return ht.table[probeIdx].Value, nil
+                }</span>
+        }
+        <span class="cov0" title="0">return "", errors.New("Key not found")</span>
+}
+
+func (ht *HashTableOpenAddr) Remove(key string) <span class="cov8" title="1">{
+        idx := ht.manualHash(key)
+        for i := 0; i &lt; ht.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % ht.capacity
+                if ht.table[probeIdx].State == EMPTY </span><span class="cov8" title="1">{
+                        return
+                }</span>
+                <span class="cov8" title="1">if ht.table[probeIdx].State == ACTIVE &amp;&amp; ht.table[probeIdx].Key == key </span><span class="cov8" title="1">{
+                        ht.table[probeIdx].State = DELETED
+                        ht.numElements--
+                        return
+                }</span>
+        }
+}
+
+func (ht *HashTableOpenAddr) Clear() <span class="cov8" title="1">{
+        ht.table = make([]Entry, ht.capacity)
+        ht.numElements = 0
+}</span>
+
+func (ht *HashTableOpenAddr) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        first := true
+        for _, entry := range ht.table </span><span class="cov8" title="1">{
+                if entry.State == ACTIVE </span><span class="cov8" title="1">{
+                        if !first </span><span class="cov0" title="0">{
+                                sb.WriteString(" ")
+                        }</span>
+                        <span class="cov8" title="1">sb.WriteString(fmt.Sprintf("%s:%s", entry.Key, entry.Value))
+                        first = false</span>
+                }
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (ht *HashTableOpenAddr) Deserialize(str string) <span class="cov8" title="1">{
+        ht.Clear()
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">pairs := strings.Split(str, " ")
+        for _, p := range pairs </span><span class="cov8" title="1">{
+                kv := strings.SplitN(p, ":", 2)
+                if len(kv) == 2 </span><span class="cov8" title="1">{
+                        ht.Put(kv[0], kv[1])
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package datastructures
+
+import (
+        "container/list"
+        "fmt"
+        "strconv"
+        "strings"
+)
+
+type ValFreq struct {
+        Value string
+        Freq  int
+}
+
+type LFUCache struct {
+        capacity      int
+        size          int
+        minFreq       int
+        keyToValFreq  map[string]ValFreq
+        freqToKeys    map[int]*list.List
+        keyToIterator map[string]*list.Element
+}
+
+func NewLFUCache(cap int) *LFUCache <span class="cov8" title="1">{
+        return &amp;LFUCache{
+                capacity:      cap,
+                size:          0,
+                minFreq:       0,
+                keyToValFreq:  make(map[string]ValFreq),
+                freqToKeys:    make(map[int]*list.List),
+                keyToIterator: make(map[string]*list.Element),
+        }
+}</span>
+
+func (c *LFUCache) updateFrequency(key string) <span class="cov8" title="1">{
+        valFreq := c.keyToValFreq[key]
+        freq := valFreq.Freq
+        c.keyToValFreq[key] = ValFreq{Value: valFreq.Value, Freq: freq + 1}
+
+        // Remove from old freq list
+        oldList := c.freqToKeys[freq]
+        elem := c.keyToIterator[key]
+        oldList.Remove(elem)
+        if oldList.Len() == 0 </span><span class="cov8" title="1">{
+                delete(c.freqToKeys, freq)
+                if c.minFreq == freq </span><span class="cov8" title="1">{
+                        c.minFreq++
+                }</span>
+        }
+
+        // Add to new freq list
+        <span class="cov8" title="1">newFreq := freq + 1
+        if _, exists := c.freqToKeys[newFreq]; !exists </span><span class="cov8" title="1">{
+                c.freqToKeys[newFreq] = list.New()
+        }</span>
+        <span class="cov8" title="1">newList := c.freqToKeys[newFreq]
+        newElem := newList.PushBack(key)
+        c.keyToIterator[key] = newElem</span>
+}
+
+func (c *LFUCache) evict() <span class="cov8" title="1">{
+        if c.size == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">minList := c.freqToKeys[c.minFreq]
+        evictElem := minList.Front() // LRU in this freq bucket
+        evictKey := evictElem.Value.(string)
+        minList.Remove(evictElem)
+        if minList.Len() == 0 </span><span class="cov8" title="1">{
+                delete(c.freqToKeys, c.minFreq)
+        }</span>
+
+        <span class="cov8" title="1">delete(c.keyToValFreq, evictKey)
+        delete(c.keyToIterator, evictKey)
+        c.size--</span>
+}
+
+func (c *LFUCache) Get(key string) string <span class="cov8" title="1">{
+        if _, exists := c.keyToValFreq[key]; !exists </span><span class="cov8" title="1">{
+                return "" // Or error
+        }</span>
+        <span class="cov8" title="1">val := c.keyToValFreq[key].Value
+        c.updateFrequency(key)
+        return val</span>
+}
+
+func (c *LFUCache) Set(key, value string) <span class="cov8" title="1">{
+        if c.capacity == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">if _, exists := c.keyToValFreq[key]; exists </span><span class="cov8" title="1">{
+                c.keyToValFreq[key] = ValFreq{Value: value, Freq: c.keyToValFreq[key].Freq}
+                c.updateFrequency(key)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if c.size &gt;= c.capacity </span><span class="cov8" title="1">{
+                c.evict()
+        }</span>
+
+        <span class="cov8" title="1">c.keyToValFreq[key] = ValFreq{Value: value, Freq: 1}
+        if _, exists := c.freqToKeys[1]; !exists </span><span class="cov8" title="1">{
+                c.freqToKeys[1] = list.New()
+        }</span>
+        <span class="cov8" title="1">c.freqToKeys[1].PushBack(key)
+        c.keyToIterator[key] = c.freqToKeys[1].Back()
+        c.minFreq = 1
+        c.size++</span>
+}
+
+func (c *LFUCache) Serialize() string <span class="cov8" title="1">{
+        // Format: capacity|key:value:freq key2:value2:freq2 ...
+        var sb strings.Builder
+        sb.WriteString(strconv.Itoa(c.capacity))
+        sb.WriteString("|")
+        first := true
+        for key, vf := range c.keyToValFreq </span><span class="cov8" title="1">{
+                if !first </span><span class="cov0" title="0">{
+                        sb.WriteString(" ")
+                }</span>
+                <span class="cov8" title="1">sb.WriteString(fmt.Sprintf("%s:%s:%d", key, vf.Value, vf.Freq))
+                first = false</span>
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (c *LFUCache) Deserialize(str string) <span class="cov8" title="1">{
+        // Clear
+        c.size = 0
+        c.minFreq = 0
+        c.keyToValFreq = make(map[string]ValFreq)
+        c.freqToKeys = make(map[int]*list.List)
+        c.keyToIterator = make(map[string]*list.Element)
+
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.SplitN(str, "|", 2)
+        if len(parts) &lt; 1 </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">capVal, err := strconv.Atoi(parts[0])
+        if err == nil </span><span class="cov8" title="1">{
+                c.capacity = capVal
+        }</span>
+
+        <span class="cov8" title="1">if len(parts) &lt; 2 || parts[1] == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">items := strings.Split(parts[1], " ")
+        for _, item := range items </span><span class="cov8" title="1">{
+                kvf := strings.Split(item, ":")
+                if len(kvf) == 3 </span><span class="cov8" title="1">{
+                        key := kvf[0]
+                        val := kvf[1]
+                        freq, _ := strconv.Atoi(kvf[2])
+                        c.internalSet(key, val, freq)
+                }</span>
+        }
+}
+
+func (c *LFUCache) internalSet(key, value string, freq int) <span class="cov8" title="1">{
+        c.keyToValFreq[key] = ValFreq{Value: value, Freq: freq}
+        if _, exists := c.freqToKeys[freq]; !exists </span><span class="cov8" title="1">{
+                c.freqToKeys[freq] = list.New()
+        }</span>
+        <span class="cov8" title="1">c.freqToKeys[freq].PushBack(key)
+        c.keyToIterator[key] = c.freqToKeys[freq].Back()
+        c.size++
+        // Recompute minFreq is hard here without scanning all freqs.
+        // But usually deserialize is followed by usage.
+        // Let's try to maintain minFreq.
+        if c.minFreq == 0 || freq &lt; c.minFreq </span><span class="cov8" title="1">{
+                c.minFreq = freq
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package datastructures
+
+import (
+        "errors"
+        "strings"
+)
+
+type Queue struct {
+        data []string
+}
+
+func NewQueue() *Queue <span class="cov8" title="1">{
+        return &amp;Queue{
+                data: make([]string, 0),
+        }
+}</span>
+
+func (q *Queue) Push(value string) <span class="cov8" title="1">{
+        q.data = append(q.data, value)
+}</span>
+
+func (q *Queue) Pop() (string, error) <span class="cov8" title="1">{
+        if len(q.data) == 0 </span><span class="cov8" title="1">{
+                return "", errors.New("queue is empty")
+        }</span>
+        <span class="cov8" title="1">val := q.data[0]
+        q.data = q.data[1:]
+        return val, nil</span>
+}
+
+func (q *Queue) Empty() bool <span class="cov8" title="1">{
+        return len(q.data) == 0
+}</span>
+
+func (q *Queue) Serialize() string <span class="cov8" title="1">{
+        return strings.Join(q.data, " ")
+}</span>
+
+func (q *Queue) Deserialize(str string) <span class="cov8" title="1">{
+        q.data = make([]string, 0)
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.Split(str, " ")
+        for _, p := range parts </span><span class="cov8" title="1">{
+                q.Push(p)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package datastructures
+
+import (
+        "strings"
+)
+
+type Set struct {
+        table         []Entry
+        capacity      int
+        numElements   int
+        maxLoadFactor float64
+}
+
+func NewSet(cap int) *Set <span class="cov8" title="1">{
+        if cap &lt;= 0 </span><span class="cov0" title="0">{
+                cap = 16
+        }</span>
+        <span class="cov8" title="1">return &amp;Set{
+                table:         make([]Entry, cap),
+                capacity:      cap,
+                numElements:   0,
+                maxLoadFactor: 0.6,
+        }</span>
+}
+
+func (s *Set) manualHash(value string) int <span class="cov8" title="1">{
+        var hash uint64 = 5381
+        for _, c := range value </span><span class="cov8" title="1">{
+                hash = ((hash &lt;&lt; 5) + hash) + uint64(c)
+        }</span>
+        <span class="cov8" title="1">return int(hash % uint64(s.capacity))</span>
+}
+
+func (s *Set) rehash() <span class="cov8" title="1">{
+        oldTable := s.table
+        s.capacity *= 2
+        s.table = make([]Entry, s.capacity)
+        s.numElements = 0
+
+        for _, entry := range oldTable </span><span class="cov8" title="1">{
+                if entry.State == ACTIVE </span><span class="cov8" title="1">{
+                        s.Add(entry.Value) // Value is stored in Value field of Entry, Key is unused or same
+                }</span>
+        }
+}
+
+func (s *Set) Add(value string) <span class="cov8" title="1">{
+        if s.Contains(value) </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">if float64(s.numElements)/float64(s.capacity) &gt;= s.maxLoadFactor </span><span class="cov8" title="1">{
+                s.rehash()
+        }</span>
+
+        <span class="cov8" title="1">idx := s.manualHash(value)
+        for i := 0; i &lt; s.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % s.capacity
+                if s.table[probeIdx].State == EMPTY || s.table[probeIdx].State == DELETED </span><span class="cov8" title="1">{
+                        s.table[probeIdx] = Entry{Value: value, State: ACTIVE}
+                        s.numElements++
+                        return
+                }</span>
+        }
+}
+
+func (s *Set) Remove(value string) <span class="cov8" title="1">{
+        idx := s.manualHash(value)
+        for i := 0; i &lt; s.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % s.capacity
+                if s.table[probeIdx].State == EMPTY </span><span class="cov8" title="1">{
+                        return
+                }</span>
+                <span class="cov8" title="1">if s.table[probeIdx].State == ACTIVE &amp;&amp; s.table[probeIdx].Value == value </span><span class="cov8" title="1">{
+                        s.table[probeIdx].State = DELETED
+                        s.numElements--
+                        return
+                }</span>
+        }
+}
+
+func (s *Set) Contains(value string) bool <span class="cov8" title="1">{
+        idx := s.manualHash(value)
+        for i := 0; i &lt; s.capacity; i++ </span><span class="cov8" title="1">{
+                probeIdx := (idx + i) % s.capacity
+                if s.table[probeIdx].State == EMPTY </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+                <span class="cov8" title="1">if s.table[probeIdx].State == ACTIVE &amp;&amp; s.table[probeIdx].Value == value </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+        <span class="cov0" title="0">return false</span>
+}
+
+func (s *Set) Size() int <span class="cov0" title="0">{
+        return s.numElements
+}</span>
+
+func (s *Set) Clear() <span class="cov8" title="1">{
+        s.table = make([]Entry, s.capacity)
+        s.numElements = 0
+}</span>
+
+func (s *Set) GetElements() []string <span class="cov8" title="1">{
+        elems := make([]string, 0, s.numElements)
+        for _, entry := range s.table </span><span class="cov8" title="1">{
+                if entry.State == ACTIVE </span><span class="cov8" title="1">{
+                        elems = append(elems, entry.Value)
+                }</span>
+        }
+        <span class="cov8" title="1">return elems</span>
+}
+
+func (s *Set) Union(other *Set) *Set <span class="cov8" title="1">{
+        res := NewSet(s.capacity + other.capacity)
+        for _, v := range s.GetElements() </span><span class="cov8" title="1">{
+                res.Add(v)
+        }</span>
+        <span class="cov8" title="1">for _, v := range other.GetElements() </span><span class="cov8" title="1">{
+                res.Add(v)
+        }</span>
+        <span class="cov8" title="1">return res</span>
+}
+
+func (s *Set) Intersection(other *Set) *Set <span class="cov8" title="1">{
+        res := NewSet(s.capacity) // Estimate
+        for _, v := range s.GetElements() </span><span class="cov8" title="1">{
+                if other.Contains(v) </span><span class="cov8" title="1">{
+                        res.Add(v)
+                }</span>
+        }
+        <span class="cov8" title="1">return res</span>
+}
+
+func (s *Set) Difference(other *Set) *Set <span class="cov8" title="1">{
+        res := NewSet(s.capacity)
+        for _, v := range s.GetElements() </span><span class="cov8" title="1">{
+                if !other.Contains(v) </span><span class="cov8" title="1">{
+                        res.Add(v)
+                }</span>
+        }
+        <span class="cov8" title="1">return res</span>
+}
+
+func (s *Set) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        first := true
+        for _, entry := range s.table </span><span class="cov8" title="1">{
+                if entry.State == ACTIVE </span><span class="cov8" title="1">{
+                        if !first </span><span class="cov0" title="0">{
+                                sb.WriteString(" ")
+                        }</span>
+                        <span class="cov8" title="1">sb.WriteString(entry.Value)
+                        first = false</span>
+                }
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (s *Set) Deserialize(str string) <span class="cov8" title="1">{
+        s.Clear()
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.Split(str, " ")
+        for _, p := range parts </span><span class="cov8" title="1">{
+                s.Add(p)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package datastructures
+
+import (
+        "errors"
+        "strings"
+)
+
+type SNode struct {
+        Value string
+        Next  *SNode
+}
+
+type SinglyLinkedList struct {
+        Head  *SNode
+        Tail  *SNode
+        Count int
+}
+
+func NewSinglyLinkedList() *SinglyLinkedList <span class="cov8" title="1">{
+        return &amp;SinglyLinkedList{}
+}</span>
+
+func (l *SinglyLinkedList) PushFront(value string) <span class="cov8" title="1">{
+        newNode := &amp;SNode{Value: value, Next: l.Head}
+        l.Head = newNode
+        if l.Tail == nil </span><span class="cov0" title="0">{
+                l.Tail = newNode
+        }</span>
+        <span class="cov8" title="1">l.Count++</span>
+}
+
+func (l *SinglyLinkedList) PushBack(value string) <span class="cov8" title="1">{
+        newNode := &amp;SNode{Value: value}
+        if l.Tail == nil </span><span class="cov8" title="1">{
+                l.Head = newNode
+                l.Tail = newNode
+        }</span> else<span class="cov8" title="1"> {
+                l.Tail.Next = newNode
+                l.Tail = newNode
+        }</span>
+        <span class="cov8" title="1">l.Count++</span>
+}
+
+func (l *SinglyLinkedList) PopFront() (string, error) <span class="cov8" title="1">{
+        if l.Head == nil </span><span class="cov8" title="1">{
+                return "", errors.New("list is empty")
+        }</span>
+        <span class="cov8" title="1">val := l.Head.Value
+        l.Head = l.Head.Next
+        if l.Head == nil </span><span class="cov8" title="1">{
+                l.Tail = nil
+        }</span>
+        <span class="cov8" title="1">l.Count--
+        return val, nil</span>
+}
+
+func (l *SinglyLinkedList) PopBack() (string, error) <span class="cov8" title="1">{
+        if l.Head == nil </span><span class="cov8" title="1">{
+                return "", errors.New("list is empty")
+        }</span>
+        <span class="cov8" title="1">if l.Head == l.Tail </span><span class="cov8" title="1">{
+                val := l.Head.Value
+                l.Head = nil
+                l.Tail = nil
+                l.Count--
+                return val, nil
+        }</span>
+        <span class="cov8" title="1">current := l.Head
+        for current.Next != l.Tail </span><span class="cov0" title="0">{
+                current = current.Next
+        }</span>
+        <span class="cov8" title="1">val := l.Tail.Value
+        l.Tail = current
+        l.Tail.Next = nil
+        l.Count--
+        return val, nil</span>
+}
+
+func (l *SinglyLinkedList) RemoveValue(value string) <span class="cov8" title="1">{
+        if l.Head == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">if l.Head.Value == value </span><span class="cov8" title="1">{
+                l.Head = l.Head.Next
+                if l.Head == nil </span><span class="cov0" title="0">{
+                        l.Tail = nil
+                }</span>
+                <span class="cov8" title="1">l.Count--
+                return</span>
+        }
+        <span class="cov8" title="1">current := l.Head
+        for current.Next != nil </span><span class="cov8" title="1">{
+                if current.Next.Value == value </span><span class="cov8" title="1">{
+                        current.Next = current.Next.Next
+                        if current.Next == nil </span><span class="cov8" title="1">{
+                                l.Tail = current
+                        }</span>
+                        <span class="cov8" title="1">l.Count--
+                        return</span>
+                }
+                <span class="cov0" title="0">current = current.Next</span>
+        }
+}
+
+func (l *SinglyLinkedList) Find(value string) bool <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == value </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+func (l *SinglyLinkedList) InsertAfter(targetValue, newValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue </span><span class="cov8" title="1">{
+                        newNode := &amp;SNode{Value: newValue, Next: current.Next}
+                        current.Next = newNode
+                        if current == l.Tail </span><span class="cov0" title="0">{
+                                l.Tail = newNode
+                        }</span>
+                        <span class="cov8" title="1">l.Count++
+                        return</span>
+                }
+                <span class="cov0" title="0">current = current.Next</span>
+        }
+}
+
+func (l *SinglyLinkedList) InsertBefore(targetValue, newValue string) <span class="cov8" title="1">{
+        if l.Head == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">if l.Head.Value == targetValue </span><span class="cov8" title="1">{
+                l.PushFront(newValue)
+                return
+        }</span>
+        <span class="cov8" title="1">current := l.Head
+        for current.Next != nil </span><span class="cov8" title="1">{
+                if current.Next.Value == targetValue </span><span class="cov8" title="1">{
+                        newNode := &amp;SNode{Value: newValue, Next: current.Next}
+                        current.Next = newNode
+                        l.Count++
+                        return
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *SinglyLinkedList) RemoveAfter(targetValue string) <span class="cov8" title="1">{
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                if current.Value == targetValue &amp;&amp; current.Next != nil </span><span class="cov8" title="1">{
+                        if current.Next == l.Tail </span><span class="cov0" title="0">{
+                                l.Tail = current
+                        }</span>
+                        <span class="cov8" title="1">current.Next = current.Next.Next
+                        l.Count--
+                        return</span>
+                }
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *SinglyLinkedList) RemoveBefore(targetValue string) <span class="cov8" title="1">{
+        if l.Head == nil || l.Head.Next == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">if l.Head.Next.Value == targetValue </span><span class="cov8" title="1">{
+                l.PopFront()
+                return
+        }</span>
+        <span class="cov8" title="1">current := l.Head
+        for current.Next != nil &amp;&amp; current.Next.Next != nil </span><span class="cov8" title="1">{
+                if current.Next.Next.Value == targetValue </span><span class="cov8" title="1">{
+                        current.Next = current.Next.Next
+                        l.Count--
+                        return
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+}
+
+func (l *SinglyLinkedList) Serialize() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        current := l.Head
+        for current != nil </span><span class="cov8" title="1">{
+                sb.WriteString(current.Value)
+                if current.Next != nil </span><span class="cov8" title="1">{
+                        sb.WriteString(" ")
+                }</span>
+                <span class="cov8" title="1">current = current.Next</span>
+        }
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (l *SinglyLinkedList) Deserialize(str string) <span class="cov8" title="1">{
+        l.Head = nil
+        l.Tail = nil
+        l.Count = 0
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.Split(str, " ")
+        for _, p := range parts </span><span class="cov8" title="1">{
+                l.PushBack(p)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package datastructures
+
+import (
+        "errors"
+        "strings"
+)
+
+type Stack struct {
+        data []string
+}
+
+func NewStack() *Stack <span class="cov8" title="1">{
+        return &amp;Stack{
+                data: make([]string, 0),
+        }
+}</span>
+
+func (s *Stack) Push(value string) <span class="cov8" title="1">{
+        s.data = append(s.data, value)
+}</span>
+
+func (s *Stack) Pop() (string, error) <span class="cov8" title="1">{
+        if len(s.data) == 0 </span><span class="cov8" title="1">{
+                return "", errors.New("stack is empty")
+        }</span>
+        <span class="cov8" title="1">lastIndex := len(s.data) - 1
+        val := s.data[lastIndex]
+        s.data = s.data[:lastIndex]
+        return val, nil</span>
+}
+
+func (s *Stack) Peek() (string, error) <span class="cov8" title="1">{
+        if len(s.data) == 0 </span><span class="cov8" title="1">{
+                return "", errors.New("stack is empty")
+        }</span>
+        <span class="cov8" title="1">return s.data[len(s.data)-1], nil</span>
+}
+
+func (s *Stack) Empty() bool <span class="cov8" title="1">{
+        return len(s.data) == 0
+}</span>
+
+func (s *Stack) Serialize() string <span class="cov8" title="1">{
+        return strings.Join(s.data, " ")
+}</span>
+
+func (s *Stack) Deserialize(str string) <span class="cov8" title="1">{
+        s.data = make([]string, 0)
+        if str == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov8" title="1">parts := strings.Split(str, " ")
+        for _, p := range parts </span><span class="cov8" title="1">{
+                s.Push(p)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package dbms
+
+import (
+        "strings"
+)
+
+type CommandParser struct{}
+
+func Parse(query string) []string <span class="cov8" title="1">{
+        return strings.Fields(query)
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package dbms
+
+import (
+        "dbms_lab_project/internal/datastructures"
+        "fmt"
+        "strconv"
+        "strings"
+)
+
+type DBMS struct {
+        arrays      map[string]*datastructures.Array
+        singlyLists map[string]*datastructures.SinglyLinkedList
+        doublyLists map[string]*datastructures.DoublyLinkedList
+        stacks      map[string]*datastructures.Stack
+        queues      map[string]*datastructures.Queue
+        trees       map[string]*datastructures.FullBinaryTree
+        sets        map[string]*datastructures.Set
+        lfuCaches   map[string]*datastructures.LFUCache
+        htChaining  map[string]*datastructures.HashTableChaining
+        htOpenAddr  map[string]*datastructures.HashTableOpenAddr
+}
+
+func NewDBMS() *DBMS <span class="cov8" title="1">{
+        return &amp;DBMS{
+                arrays:      make(map[string]*datastructures.Array),
+                singlyLists: make(map[string]*datastructures.SinglyLinkedList),
+                doublyLists: make(map[string]*datastructures.DoublyLinkedList),
+                stacks:      make(map[string]*datastructures.Stack),
+                queues:      make(map[string]*datastructures.Queue),
+                trees:       make(map[string]*datastructures.FullBinaryTree),
+                sets:        make(map[string]*datastructures.Set),
+                lfuCaches:   make(map[string]*datastructures.LFUCache),
+                htChaining:  make(map[string]*datastructures.HashTableChaining),
+                htOpenAddr:  make(map[string]*datastructures.HashTableOpenAddr),
+        }
+}</span>
+
+func (db *DBMS) Clear() <span class="cov8" title="1">{
+        db.arrays = make(map[string]*datastructures.Array)
+        db.singlyLists = make(map[string]*datastructures.SinglyLinkedList)
+        db.doublyLists = make(map[string]*datastructures.DoublyLinkedList)
+        db.stacks = make(map[string]*datastructures.Stack)
+        db.queues = make(map[string]*datastructures.Queue)
+        db.trees = make(map[string]*datastructures.FullBinaryTree)
+        db.sets = make(map[string]*datastructures.Set)
+        db.lfuCaches = make(map[string]*datastructures.LFUCache)
+        db.htChaining = make(map[string]*datastructures.HashTableChaining)
+        db.htOpenAddr = make(map[string]*datastructures.HashTableOpenAddr)
+}</span>
+
+func (db *DBMS) LoadStructure(typeStr, name, data string) <span class="cov8" title="1">{
+        switch typeStr </span>{
+        case "Array":<span class="cov8" title="1">
+                arr := datastructures.NewArray()
+                arr.Deserialize(data)
+                db.arrays[name] = arr</span>
+        case "SinglyLinkedList":<span class="cov8" title="1">
+                l := datastructures.NewSinglyLinkedList()
+                l.Deserialize(data)
+                db.singlyLists[name] = l</span>
+        case "DoublyLinkedList":<span class="cov8" title="1">
+                l := datastructures.NewDoublyLinkedList()
+                l.Deserialize(data)
+                db.doublyLists[name] = l</span>
+        case "Stack":<span class="cov8" title="1">
+                s := datastructures.NewStack()
+                s.Deserialize(data)
+                db.stacks[name] = s</span>
+        case "Queue":<span class="cov8" title="1">
+                q := datastructures.NewQueue()
+                q.Deserialize(data)
+                db.queues[name] = q</span>
+        case "FullBinaryTree":<span class="cov8" title="1">
+                t := datastructures.NewFullBinaryTree()
+                t.Deserialize(data)
+                db.trees[name] = t</span>
+        case "Set":<span class="cov8" title="1">
+                s := datastructures.NewSet(16)
+                s.Deserialize(data)
+                db.sets[name] = s</span>
+        case "LFUCache":<span class="cov8" title="1">
+                c := datastructures.NewLFUCache(0) // Capacity will be set in deserialize
+                c.Deserialize(data)
+                db.lfuCaches[name] = c</span>
+        case "HashTableChaining":<span class="cov8" title="1">
+                ht := datastructures.NewHashTableChaining(16)
+                ht.Deserialize(data)
+                db.htChaining[name] = ht</span>
+        case "HashTableOpenAddr":<span class="cov8" title="1">
+                ht := datastructures.NewHashTableOpenAddr(16)
+                ht.Deserialize(data)
+                db.htOpenAddr[name] = ht</span>
+        }
+}
+
+func (db *DBMS) SerializeAll() string <span class="cov8" title="1">{
+        var sb strings.Builder
+        for name, s := range db.arrays </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("Array %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.singlyLists </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("SinglyLinkedList %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.doublyLists </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("DoublyLinkedList %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.stacks </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("Stack %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.queues </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("Queue %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.trees </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("FullBinaryTree %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.sets </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("Set %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.lfuCaches </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("LFUCache %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.htChaining </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("HashTableChaining %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">for name, s := range db.htOpenAddr </span><span class="cov8" title="1">{
+                sb.WriteString(fmt.Sprintf("HashTableOpenAddr %s %s\n", name, s.Serialize()))
+        }</span>
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+func (db *DBMS) Execute(command []string) string <span class="cov8" title="1">{
+        if len(command) == 0 </span><span class="cov8" title="1">{
+                return "Error: Empty command."
+        }</span>
+        <span class="cov8" title="1">cmd := command[0]
+        if cmd == "PRINT" </span><span class="cov0" title="0">{
+                return db.SerializeAll()
+        }</span>
+        <span class="cov8" title="1">if cmd == "SEMPTY" </span><span class="cov8" title="1">{
+                if len(command) &lt; 2 </span><span class="cov8" title="1">{
+                        return "Error: SEMPTY requires a name."
+                }</span>
+                <span class="cov8" title="1">if s, ok := db.stacks[command[1]]; ok </span><span class="cov8" title="1">{
+                        if s.Empty() </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Stack '" + command[1] + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "QEMPTY" </span><span class="cov8" title="1">{
+                if len(command) &lt; 2 </span><span class="cov8" title="1">{
+                        return "Error: QEMPTY requires a name."
+                }</span>
+                <span class="cov8" title="1">if q, ok := db.queues[command[1]]; ok </span><span class="cov8" title="1">{
+                        if q.Empty() </span><span class="cov0" title="0">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Queue '" + command[1] + "' not found."</span>
+        }
+
+        <span class="cov8" title="1">if len(command) &lt; 2 </span><span class="cov8" title="1">{
+                return "Error: Command requires a name."
+        }</span>
+        <span class="cov8" title="1">name := command[1]
+
+        // Array
+        if cmd == "MPUSH" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov0" title="0">{
+                        return "Error: MPUSH requires at least one value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.arrays[name]; !ok </span><span class="cov8" title="1">{
+                        db.arrays[name] = datastructures.NewArray()
+                }</span>
+                <span class="cov8" title="1">for i := 2; i &lt; len(command); i++ </span><span class="cov8" title="1">{
+                        db.arrays[name].PushBack(command[i])
+                }</span>
+                <span class="cov8" title="1">return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "MGET" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: MGET requires an index."
+                }</span>
+                <span class="cov8" title="1">if arr, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        idx, err := strconv.Atoi(command[2])
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: Invalid index."
+                        }</span>
+                        <span class="cov8" title="1">val, err := arr.Get(idx)
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: Array '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "MDEL" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: MDEL requires an index."
+                }</span>
+                <span class="cov8" title="1">if arr, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        idx, err := strconv.Atoi(command[2])
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: Invalid index."
+                        }</span>
+                        <span class="cov8" title="1">err = arr.Remove(idx)
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; OK"</span>
+                }
+                <span class="cov8" title="1">return "Error: Array '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "MINSERT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: MINSERT requires an index and a value."
+                }</span>
+                <span class="cov8" title="1">if arr, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        idx, err := strconv.Atoi(command[2])
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: Invalid index."
+                        }</span>
+                        <span class="cov8" title="1">err = arr.Insert(idx, command[3])
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov0" title="0">return "-&gt; OK"</span>
+                }
+                <span class="cov0" title="0">return "Error: Array '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "MSET" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: MSET requires an index and a value."
+                }</span>
+                <span class="cov8" title="1">if arr, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        idx, err := strconv.Atoi(command[2])
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: Invalid index."
+                        }</span>
+                        <span class="cov8" title="1">err = arr.Set(idx, command[3])
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov0" title="0">return "-&gt; OK"</span>
+                }
+                <span class="cov0" title="0">return "Error: Array '" + name + "' not found."</span>
+        }
+
+        // Stack
+        <span class="cov8" title="1">if cmd == "SPUSH" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: SPUSH requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.stacks[name]; !ok </span><span class="cov8" title="1">{
+                        db.stacks[name] = datastructures.NewStack()
+                }</span>
+                <span class="cov8" title="1">db.stacks[name].Push(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "SPOP" </span><span class="cov8" title="1">{
+                if s, ok := db.stacks[name]; ok </span><span class="cov8" title="1">{
+                        val, err := s.Pop()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: Stack '" + name + "' not found."</span>
+        }
+
+        // Queue
+        <span class="cov8" title="1">if cmd == "QPUSH" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: QPUSH requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.queues[name]; !ok </span><span class="cov8" title="1">{
+                        db.queues[name] = datastructures.NewQueue()
+                }</span>
+                <span class="cov8" title="1">db.queues[name].Push(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "QPOP" </span><span class="cov8" title="1">{
+                if q, ok := db.queues[name]; ok </span><span class="cov8" title="1">{
+                        val, err := q.Pop()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: Queue '" + name + "' not found."</span>
+        }
+
+        // SinglyLinkedList
+        <span class="cov8" title="1">if cmd == "LPUSHFRONT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LPUSHFRONT requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.singlyLists[name]; !ok </span><span class="cov8" title="1">{
+                        db.singlyLists[name] = datastructures.NewSinglyLinkedList()
+                }</span>
+                <span class="cov8" title="1">db.singlyLists[name].PushFront(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "LPUSHBACK" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LPUSHBACK requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.singlyLists[name]; !ok </span><span class="cov8" title="1">{
+                        db.singlyLists[name] = datastructures.NewSinglyLinkedList()
+                }</span>
+                <span class="cov8" title="1">db.singlyLists[name].PushBack(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "LPOPFRONT" </span><span class="cov8" title="1">{
+                if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        val, err := l.PopFront()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LPOPBACK" </span><span class="cov8" title="1">{
+                if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        val, err := l.PopBack()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LREMOVE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LREMOVE requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveValue(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov8" title="1">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LFIND" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LFIND requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        if l.Find(command[2]) </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LINSERT_AFTER" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: LINSERT_AFTER requires target and new value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.InsertAfter(command[2], command[3])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LINSERT_BEFORE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: LINSERT_BEFORE requires target and new value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.InsertBefore(command[2], command[3])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LREMOVE_AFTER" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LREMOVE_AFTER requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveAfter(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LREMOVE_BEFORE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: LREMOVE_BEFORE requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.singlyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveBefore(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+
+        // DoublyLinkedList
+        <span class="cov8" title="1">if cmd == "DLPUSHFRONT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLPUSHFRONT requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.doublyLists[name]; !ok </span><span class="cov8" title="1">{
+                        db.doublyLists[name] = datastructures.NewDoublyLinkedList()
+                }</span>
+                <span class="cov8" title="1">db.doublyLists[name].PushFront(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLPUSHBACK" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLPUSHBACK requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.doublyLists[name]; !ok </span><span class="cov8" title="1">{
+                        db.doublyLists[name] = datastructures.NewDoublyLinkedList()
+                }</span>
+                <span class="cov8" title="1">db.doublyLists[name].PushBack(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLPOPFRONT" </span><span class="cov8" title="1">{
+                if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        val, err := l.PopFront()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLPOPBACK" </span><span class="cov8" title="1">{
+                if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        val, err := l.PopBack()
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLREMOVE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLREMOVE requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveValue(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov8" title="1">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLFIND" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLFIND requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        if l.Find(command[2]) </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLINSERT_AFTER" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: DLINSERT_AFTER requires target and new value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.InsertAfter(command[2], command[3])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLINSERT_BEFORE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: DLINSERT_BEFORE requires target and new value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.InsertBefore(command[2], command[3])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLREMOVE_AFTER" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLREMOVE_AFTER requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveAfter(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "DLREMOVE_BEFORE" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: DLREMOVE_BEFORE requires a value."
+                }</span>
+                <span class="cov8" title="1">if l, ok := db.doublyLists[name]; ok </span><span class="cov8" title="1">{
+                        l.RemoveBefore(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov0" title="0">return "Error: List '" + name + "' not found."</span>
+        }
+
+        // HashTableChaining
+        <span class="cov8" title="1">if cmd == "HPUT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: HPUT requires key and value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.htChaining[name]; !ok </span><span class="cov8" title="1">{
+                        db.htChaining[name] = datastructures.NewHashTableChaining(16)
+                }</span>
+                <span class="cov8" title="1">db.htChaining[name].Put(command[2], command[3])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "HGET" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: HGET requires a key."
+                }</span>
+                <span class="cov8" title="1">if ht, ok := db.htChaining[name]; ok </span><span class="cov8" title="1">{
+                        val, err := ht.Get(command[2])
+                        if err != nil </span><span class="cov8" title="1">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: HashTable '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "HDEL" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: HDEL requires a key."
+                }</span>
+                <span class="cov8" title="1">if ht, ok := db.htChaining[name]; ok </span><span class="cov8" title="1">{
+                        ht.Remove(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov8" title="1">return "Error: HashTable '" + name + "' not found."</span>
+        }
+
+        // HashTableOpenAddr
+        <span class="cov8" title="1">if cmd == "OHPUT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: OHPUT requires key and value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.htOpenAddr[name]; !ok </span><span class="cov8" title="1">{
+                        db.htOpenAddr[name] = datastructures.NewHashTableOpenAddr(16)
+                }</span>
+                <span class="cov8" title="1">db.htOpenAddr[name].Put(command[2], command[3])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "OHGET" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: OHGET requires a key."
+                }</span>
+                <span class="cov8" title="1">if ht, ok := db.htOpenAddr[name]; ok </span><span class="cov8" title="1">{
+                        val, err := ht.Get(command[2])
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "Error: " + err.Error()
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: HashTable '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "OHDEL" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: OHDEL requires a key."
+                }</span>
+                <span class="cov8" title="1">if ht, ok := db.htOpenAddr[name]; ok </span><span class="cov0" title="0">{
+                        ht.Remove(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov8" title="1">return "Error: HashTable '" + name + "' not found."</span>
+        }
+
+        // FullBinaryTree
+        <span class="cov8" title="1">if cmd == "TINSERT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: TINSERT requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.trees[name]; !ok </span><span class="cov8" title="1">{
+                        db.trees[name] = datastructures.NewFullBinaryTree()
+                }</span>
+                <span class="cov8" title="1">db.trees[name].Insert(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "TFIND" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: TFIND requires a value."
+                }</span>
+                <span class="cov8" title="1">if t, ok := db.trees[name]; ok </span><span class="cov8" title="1">{
+                        if t.Find(command[2]) </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Tree '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "TISFULL" </span><span class="cov8" title="1">{
+                if t, ok := db.trees[name]; ok </span><span class="cov0" title="0">{
+                        if t.IsFull() </span><span class="cov0" title="0">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov0" title="0">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Tree '" + name + "' not found."</span>
+        }
+
+        // Set
+        <span class="cov8" title="1">if cmd == "SADD" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: SADD requires a value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.sets[name]; !ok </span><span class="cov8" title="1">{
+                        db.sets[name] = datastructures.NewSet(16)
+                }</span>
+                <span class="cov8" title="1">db.sets[name].Add(command[2])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "SREM" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: SREM requires a value."
+                }</span>
+                <span class="cov8" title="1">if s, ok := db.sets[name]; ok </span><span class="cov8" title="1">{
+                        s.Remove(command[2])
+                        return "-&gt; OK"
+                }</span>
+                <span class="cov8" title="1">return "Error: Set '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "SISMEMBER" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: SISMEMBER requires a value."
+                }</span>
+                <span class="cov8" title="1">if s, ok := db.sets[name]; ok </span><span class="cov8" title="1">{
+                        if s.Contains(command[2]) </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Set '" + name + "' not found."</span>
+        }
+
+        // LFUCache
+        <span class="cov8" title="1">if cmd == "CPUT" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: CPUT requires key and value."
+                }</span>
+                <span class="cov8" title="1">if _, ok := db.lfuCaches[name]; !ok </span><span class="cov8" title="1">{
+                        // Default capacity 3 if not exists? Or error?
+                        // C++ code doesn't show auto-creation with capacity.
+                        // Assuming user should create it or default 3.
+                        db.lfuCaches[name] = datastructures.NewLFUCache(3)
+                }</span>
+                <span class="cov8" title="1">db.lfuCaches[name].Set(command[2], command[3])
+                return "-&gt; OK"</span>
+        }
+        <span class="cov8" title="1">if cmd == "CGET" </span><span class="cov8" title="1">{
+                if len(command) &lt; 3 </span><span class="cov8" title="1">{
+                        return "Error: CGET requires a key."
+                }</span>
+                <span class="cov8" title="1">if c, ok := db.lfuCaches[name]; ok </span><span class="cov8" title="1">{
+                        val := c.Get(command[2])
+                        if val == "" </span><span class="cov0" title="0">{
+                                return "Error: Key not found"
+                        }</span>
+                        <span class="cov8" title="1">return "-&gt; " + val</span>
+                }
+                <span class="cov8" title="1">return "Error: Cache '" + name + "' not found."</span>
+        }
+
+        // Tasks
+        <span class="cov8" title="1">if cmd == "ASTEROIDS" </span><span class="cov8" title="1">{
+                if arr, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        res := solveAsteroids(arr)
+                        return "-&gt; " + res.Serialize()
+                }</span>
+                <span class="cov8" title="1">return "Error: Array '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "MINPARTITION" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: MINPARTITION requires input set and two output sets."
+                }</span>
+                <span class="cov8" title="1">inputName := name
+                s1Name := command[2]
+                s2Name := command[3]
+                if input, ok := db.sets[inputName]; ok </span><span class="cov8" title="1">{
+                        if _, ok := db.sets[s1Name]; !ok </span><span class="cov8" title="1">{
+                                db.sets[s1Name] = datastructures.NewSet(16)
+                        }</span>
+                        <span class="cov8" title="1">if _, ok := db.sets[s2Name]; !ok </span><span class="cov8" title="1">{
+                                db.sets[s2Name] = datastructures.NewSet(16)
+                        }</span>
+                        <span class="cov8" title="1">diff := solveMinPartition(input, db.sets[s1Name], db.sets[s2Name])
+                        return "-&gt; " + diff</span>
+                }
+                <span class="cov8" title="1">return "Error: Set '" + inputName + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "FINDSUM" </span><span class="cov8" title="1">{
+                if len(command) &lt; 4 </span><span class="cov8" title="1">{
+                        return "Error: FINDSUM requires target and output array."
+                }</span>
+                <span class="cov8" title="1">target, err := strconv.Atoi(command[2])
+                if err != nil </span><span class="cov8" title="1">{
+                        return "Error: Invalid target."
+                }</span>
+                <span class="cov8" title="1">outputName := command[3]
+                if input, ok := db.arrays[name]; ok </span><span class="cov8" title="1">{
+                        if _, ok := db.arrays[outputName]; !ok </span><span class="cov8" title="1">{
+                                db.arrays[outputName] = datastructures.NewArray()
+                        }</span>
+                        <span class="cov8" title="1">found := solveFindSum(input, target, db.arrays[outputName])
+                        if found </span><span class="cov8" title="1">{
+                                return "-&gt; TRUE"
+                        }</span>
+                        <span class="cov0" title="0">return "-&gt; FALSE"</span>
+                }
+                <span class="cov8" title="1">return "Error: Array '" + name + "' not found."</span>
+        }
+        <span class="cov8" title="1">if cmd == "LONGESTSUBSTR" </span><span class="cov8" title="1">{
+                // name is the string itself? No, command is LONGESTSUBSTR &lt;string&gt;
+                // Wait, C++ code: solveLongestSubstring(const std::string&amp; s)
+                // DBMS.cpp:
+                // if (cmd == "LONGESTSUBSTR") { if (command.size() &lt; 2) ... return "-&gt; " + std::to_string(solveLongestSubstring(command[1])); }
+                // So name is the string.
+                return "-&gt; " + strconv.Itoa(solveLongestSubstring(name))
+        }</span>
+
+        <span class="cov0" title="0">return "Error: Unknown command."</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package dbms
+
+import (
+        "bufio"
+        "os"
+        "strings"
+)
+
+type StorageManager struct {
+        filepath string
+}
+
+func NewStorageManager(path string) *StorageManager <span class="cov8" title="1">{
+        return &amp;StorageManager{filepath: path}
+}</span>
+
+func (sm *StorageManager) Load(db *DBMS) error <span class="cov8" title="1">{
+        file, err := os.Open(sm.filepath)
+        if err != nil </span><span class="cov8" title="1">{
+                if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                        return nil // File doesn't exist, start with empty DB
+                }</span>
+                <span class="cov8" title="1">return err</span>
+        }
+        <span class="cov8" title="1">defer file.Close()
+
+        db.Clear()
+        scanner := bufio.NewScanner(file)
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                line := scanner.Text()
+                parts := strings.SplitN(line, " ", 3)
+                if len(parts) &lt; 2 </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">typeStr := parts[0]
+                name := parts[1]
+                data := ""
+                if len(parts) == 3 </span><span class="cov8" title="1">{
+                        data = parts[2]
+                }</span>
+                <span class="cov8" title="1">db.LoadStructure(typeStr, name, data)</span>
+        }
+        <span class="cov8" title="1">return scanner.Err()</span>
+}
+
+func (sm *StorageManager) Save(db *DBMS) error <span class="cov8" title="1">{
+        file, err := os.Create(sm.filepath)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">defer file.Close()
+
+        content := db.SerializeAll()
+        _, err = file.WriteString(content)
+        return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package dbms
+
+import (
+        "dbms_lab_project/internal/datastructures"
+        "math"
+        "strconv"
+        "strings"
+)
+
+func solveAsteroids(input *datastructures.Array) *datastructures.Array <span class="cov8" title="1">{
+        stack := datastructures.NewStack()
+        var asteroids []int
+
+        for i := 0; i &lt; input.Size(); i++ </span><span class="cov8" title="1">{
+                valStr, _ := input.Get(i)
+                val, err := strconv.Atoi(valStr)
+                if err == nil </span><span class="cov8" title="1">{
+                        asteroids = append(asteroids, val)
+                }</span>
+        }
+
+        <span class="cov8" title="1">for _, ast := range asteroids </span><span class="cov8" title="1">{
+                currentAst := ast
+                for currentAst &lt; 0 &amp;&amp; !stack.Empty() </span><span class="cov8" title="1">{
+                        topStr, _ := stack.Peek()
+                        top, _ := strconv.Atoi(topStr)
+                        if top &gt; 0 </span><span class="cov8" title="1">{
+                                if top &gt; -currentAst </span><span class="cov8" title="1">{
+                                        // Top is bigger
+                                        newSize := top - (-currentAst)
+                                        stack.Pop()
+                                        stack.Push(strconv.Itoa(newSize))
+                                        currentAst = 0
+                                }</span> else<span class="cov0" title="0"> if top &lt; -currentAst </span><span class="cov0" title="0">{
+                                        // Current is bigger
+                                        newSize := (-currentAst) - top
+                                        stack.Pop()
+                                        currentAst = -newSize
+                                }</span> else<span class="cov0" title="0"> {
+                                        // Equal
+                                        stack.Pop()
+                                        currentAst = 0
+                                }</span>
+                        } else<span class="cov0" title="0"> {
+                                break</span>
+                        }
+                }
+                <span class="cov8" title="1">if currentAst != 0 </span><span class="cov8" title="1">{
+                        stack.Push(strconv.Itoa(currentAst))
+                }</span>
+        }
+
+        <span class="cov8" title="1">result := datastructures.NewArray()
+        // Stack is reversed (Top -&gt; Bottom), we need Bottom -&gt; Top
+        // My Stack implementation: Serialize gives Bottom -&gt; Top.
+        // But here we want to push to Array in order.
+        // Stack Pop gives Top.
+        // So we pop all to a temp stack to reverse, then pop to array.
+        tempStack := datastructures.NewStack()
+        for !stack.Empty() </span><span class="cov8" title="1">{
+                val, _ := stack.Pop()
+                tempStack.Push(val)
+        }</span>
+        <span class="cov8" title="1">for !tempStack.Empty() </span><span class="cov8" title="1">{
+                val, _ := tempStack.Pop()
+                result.PushBack(val)
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+
+func solveMinPartition(input *datastructures.Set, s1, s2 *datastructures.Set) string <span class="cov8" title="1">{
+        var nums []int
+        var numStrs []string
+        totalSum := 0
+
+        elements := input.GetElements()
+        for _, s := range elements </span><span class="cov8" title="1">{
+                num, err := strconv.Atoi(s)
+                if err == nil </span><span class="cov8" title="1">{
+                        nums = append(nums, num)
+                        numStrs = append(numStrs, s)
+                        totalSum += num
+                }</span>
+        }
+
+        <span class="cov8" title="1">n := len(nums)
+        targetSum := totalSum / 2
+        dp := make([]bool, targetSum+1)
+        parent := make([]int, targetSum+1)
+        for i := range parent </span><span class="cov8" title="1">{
+                parent[i] = -1
+        }</span>
+        <span class="cov8" title="1">dp[0] = true
+
+        for i := 0; i &lt; n; i++ </span><span class="cov8" title="1">{
+                for j := targetSum; j &gt;= nums[i]; j-- </span><span class="cov8" title="1">{
+                        if dp[j-nums[i]] &amp;&amp; !dp[j] </span><span class="cov8" title="1">{
+                                dp[j] = true
+                                parent[j] = i
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">s1Sum := 0
+        for j := targetSum; j &gt;= 0; j-- </span><span class="cov8" title="1">{
+                if dp[j] </span><span class="cov8" title="1">{
+                        s1Sum = j
+                        break</span>
+                }
+        }
+
+        <span class="cov8" title="1">s1Indices := make([]bool, n)
+        currSum := s1Sum
+        for currSum &gt; 0 &amp;&amp; parent[currSum] != -1 </span><span class="cov8" title="1">{
+                index := parent[currSum]
+                s1Indices[index] = true
+                s1.Add(numStrs[index])
+                currSum -= nums[index]
+        }</span>
+
+        <span class="cov8" title="1">for i := 0; i &lt; n; i++ </span><span class="cov8" title="1">{
+                if !s1Indices[i] </span><span class="cov8" title="1">{
+                        s2.Add(numStrs[i])
+                }</span>
+        }
+
+        <span class="cov8" title="1">s2Sum := totalSum - s1Sum
+        diff := int(math.Abs(float64(s1Sum - s2Sum)))
+        return strconv.Itoa(diff)</span>
+}
+
+func solveFindSum(input *datastructures.Array, target int, output *datastructures.Array) bool <span class="cov8" title="1">{
+        var nums []int
+        var numStrs []string
+        for i := 0; i &lt; input.Size(); i++ </span><span class="cov8" title="1">{
+                s, _ := input.Get(i)
+                num, err := strconv.Atoi(s)
+                if err == nil </span><span class="cov8" title="1">{
+                        nums = append(nums, num)
+                        numStrs = append(numStrs, s)
+                }</span>
+        }
+
+        <span class="cov8" title="1">prefixSumMap := make(map[int][]int)
+        prefixSumMap[0] = append(prefixSumMap[0], -1)
+
+        currentSum := 0
+        found := false
+
+        for i := 0; i &lt; len(nums); i++ </span><span class="cov8" title="1">{
+                currentSum += nums[i]
+                diff := currentSum - target
+                if indices, ok := prefixSumMap[diff]; ok </span><span class="cov8" title="1">{
+                        for _, startIndex := range indices </span><span class="cov8" title="1">{
+                                found = true
+                                var sb strings.Builder
+                                sb.WriteString("{")
+                                for j := startIndex + 1; j &lt;= i; j++ </span><span class="cov8" title="1">{
+                                        sb.WriteString(numStrs[j])
+                                        if j != i </span><span class="cov8" title="1">{
+                                                sb.WriteString(", ")
+                                        }</span>
+                                }
+                                <span class="cov8" title="1">sb.WriteString("}")
+                                output.PushBack(sb.String())</span>
+                        }
+                }
+                <span class="cov8" title="1">prefixSumMap[currentSum] = append(prefixSumMap[currentSum], i)</span>
+        }
+        <span class="cov8" title="1">return found</span>
+}
+
+func solveLongestSubstring(s string) int <span class="cov8" title="1">{
+        if s == "" </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">charMap := datastructures.NewHashTableOpenAddr(16)
+        left := 0
+        maxLength := 0
+
+        for right := 0; right &lt; len(s); right++ </span><span class="cov8" title="1">{
+                charStr := string(s[right])
+                foundIndexStr, err := charMap.Get(charStr)
+                if err == nil </span><span class="cov8" title="1">{
+                        lastPos, _ := strconv.Atoi(foundIndexStr)
+                        if lastPos &gt;= left </span><span class="cov8" title="1">{
+                                left = lastPos + 1
+                        }</span>
+                }
+                <span class="cov8" title="1">charMap.Put(charStr, strconv.Itoa(right))
+                if right-left+1 &gt; maxLength </span><span class="cov8" title="1">{
+                        maxLength = right - left + 1
+                }</span>
+        }
+        <span class="cov8" title="1">return maxLength</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

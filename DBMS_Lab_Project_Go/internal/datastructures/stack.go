@@ -1,8 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"strings"
 )
 
 type Stack struct {
@@ -41,7 +41,12 @@ func (s *Stack) Empty() bool {
 }
 
 func (s *Stack) Serialize() string {
-	return strings.Join(s.data, " ")
+	var buf bytes.Buffer
+	WriteSize(&buf, len(s.data))
+	for _, v := range s.data {
+		WriteString(&buf, v)
+	}
+	return buf.String()
 }
 
 func (s *Stack) Deserialize(str string) {
@@ -49,8 +54,10 @@ func (s *Stack) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	parts := strings.Split(str, " ")
-	for _, p := range parts {
-		s.Push(p)
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		v, _ := ReadString(buf)
+		s.Push(v)
 	}
 }

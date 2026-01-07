@@ -1,8 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"strings"
 )
 
 type SNode struct {
@@ -184,16 +184,14 @@ func (l *SinglyLinkedList) RemoveBefore(targetValue string) {
 }
 
 func (l *SinglyLinkedList) Serialize() string {
-	var sb strings.Builder
+	var buf bytes.Buffer
+	WriteSize(&buf, l.Count)
 	current := l.Head
 	for current != nil {
-		sb.WriteString(current.Value)
-		if current.Next != nil {
-			sb.WriteString(" ")
-		}
+		WriteString(&buf, current.Value)
 		current = current.Next
 	}
-	return sb.String()
+	return buf.String()
 }
 
 func (l *SinglyLinkedList) Deserialize(str string) {
@@ -203,8 +201,10 @@ func (l *SinglyLinkedList) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	parts := strings.Split(str, " ")
-	for _, p := range parts {
-		l.PushBack(p)
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		val, _ := ReadString(buf)
+		l.PushBack(val)
 	}
 }

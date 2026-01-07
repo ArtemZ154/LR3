@@ -1,5 +1,6 @@
 #include "DoublyLinkedList.h"
 #include <sstream>
+#include "../BinaryUtils.h"
 #include <stdexcept>
 template<typename T> struct DoublyLinkedList<T>::Node {
     T data;
@@ -73,14 +74,23 @@ template<typename T> T DoublyLinkedList<T>::pop_back() {
 template<typename T> size_t DoublyLinkedList<T>::size() const { return count; }
 template<typename T> std::string DoublyLinkedList<T>::serialize() const {
     std::stringstream ss;
-    for (Node* curr = head.get(); curr; curr = curr->next.get()) ss << curr->data << (curr->next ? " " : "");
+    writeSize(ss, count);
+    for (Node* curr = head.get(); curr; curr = curr->next.get()) {
+        writeValue(ss, curr->data);
+    }
     return ss.str();
 }
 template<typename T> void DoublyLinkedList<T>::deserialize(const std::string& str) {
     head.reset(); tail = nullptr; count = 0;
+    if (str.empty()) return;
     std::stringstream ss(str);
-    T item;
-    while (ss >> item) push_back(item);
+    size_t size;
+    readSize(ss, size);
+    for(size_t i = 0; i < size; ++i) {
+        T item;
+        readValue(ss, item);
+        push_back(item);
+    }
 }
 template<typename T>
 void DoublyLinkedList<T>::insert_after(const T& target_value, const T& new_value) {

@@ -1,5 +1,7 @@
 #include "Set.h"
 #include <functional> // Для std::hash
+#include <sstream>
+#include "../BinaryUtils.h"
 
 // --- Общая хеш-функция, использующая std::hash ---
 template<typename T>
@@ -253,12 +255,10 @@ T* Set<T>::getElements() const {
 template<typename T>
 std::string Set<T>::serialize() const {
     std::stringstream ss;
-    bool first = true;
+    writeSize(ss, numElements);
     for (size_t i = 0; i < capacity; ++i) {
         if (table[i].state == ACTIVE) {
-            if (!first) ss << " ";
-            ss << table[i].value;
-            first = false;
+            writeValue(ss, table[i].value);
         }
     }
     return ss.str();
@@ -267,9 +267,13 @@ std::string Set<T>::serialize() const {
 template<typename T>
 void Set<T>::deserialize(const std::string& str) {
     clear();
+    if (str.empty()) return;
     std::stringstream ss(str);
-    T value;
-    while (ss >> value) {
+    size_t size;
+    readSize(ss, size);
+    for (size_t i = 0; i < size; ++i) {
+        T value;
+        readValue(ss, value);
         add(value);
     }
 }

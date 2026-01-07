@@ -8,7 +8,7 @@ class FullBinaryTree {
 private:
     struct Node;
     std::unique_ptr<Node> root;
-    void serializeRecursive(const Node* node, int depth, std::stringstream& ss) const;
+    void serializeRecursive(const Node* node, std::stringstream& ss) const;
     bool isFullRecursive(const Node* node) const;
     bool findRecursive(const Node* node, const T& value) const;
 

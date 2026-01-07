@@ -8,6 +8,7 @@
 #include <algorithm> // для std::max
 #include <memory>  // для std::unique_ptr (Задание 5)
 #include "DataStructures/HashTableOpenAddr.h" // Для solveLongestSubstring
+#include "BinaryUtils.h"
 
 // --- Анонимное пространство имен для helper-функций ---
 namespace {
@@ -399,16 +400,32 @@ void DBMS::loadStructure(const std::string& type, const std::string& name, const
 
 std::string DBMS::serializeAll() const {
     std::stringstream ss;
-    for (const auto& p : arrays) ss << "Array " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : singly_lists) ss << "SinglyLinkedList " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : doubly_lists) ss << "DoublyLinkedList " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : stacks) ss << "Stack " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : queues) ss << "Queue " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : trees) ss << "Tree " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : sets) ss << "Set " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : lfu_caches) ss << "LFUCache " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : ht_chaining) ss << "HT_Chain " << p.first << " " << p.second.serialize() << "\n";
-    for (const auto& p : ht_open_addr) ss << "HT_Open " << p.first << " " << p.second.serialize() << "\n";
+    size_t total = arrays.size() + singly_lists.size() + doubly_lists.size() + 
+                   stacks.size() + queues.size() + trees.size() + sets.size() + 
+                   lfu_caches.size() + ht_chaining.size() + ht_open_addr.size();
+    
+    writeSize(ss, total);
+
+    auto saveMap = [&](const auto& map, const std::string& type) {
+        for (const auto& pair : map) {
+            writeString(ss, type);
+            writeString(ss, pair.first);
+            std::string data = pair.second.serialize();
+            writeString(ss, data);
+        }
+    };
+
+    saveMap(arrays, "Array");
+    saveMap(singly_lists, "SinglyLinkedList");
+    saveMap(doubly_lists, "DoublyLinkedList");
+    saveMap(stacks, "Stack");
+    saveMap(queues, "Queue");
+    saveMap(trees, "Tree");
+    saveMap(sets, "Set");
+    saveMap(lfu_caches, "LFUCache");
+    saveMap(ht_chaining, "HT_Chain");
+    saveMap(ht_open_addr, "HT_Open");
+
     return ss.str();
 }
 

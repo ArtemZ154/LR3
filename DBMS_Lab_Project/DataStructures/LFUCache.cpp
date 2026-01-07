@@ -1,5 +1,6 @@
 #include "LFUCache.h"
 #include <sstream>
+#include "../BinaryUtils.h"
 
 LFUCache::LFUCache(int cap) : capacity(cap), size(0), minFreq(0) {}
 
@@ -83,20 +84,17 @@ void LFUCache::set(const std::string& key, const std::string& value) {
 
 std::string LFUCache::serialize() const {
     std::stringstream ss;
-    // 1. Сохраняем ёмкость
-    ss << capacity;
-    // 2. Сохраняем все тройки (ключ, значение, частота)
+    writeSize(ss, capacity);
+    writeSize(ss, keyToValFreq.size());
     for (const auto& pair : keyToValFreq) {
-        const std::string& key = pair.first;
-        const std::string& val = pair.second.first;
-        int freq = pair.second.second;
-        ss << " " << key << " " << val << " " << freq;
+        writeString(ss, pair.first);
+        writeString(ss, pair.second.first);
+        writeInt(ss, pair.second.second);
     }
     return ss.str();
 }
 
 void LFUCache::deserialize(const std::string& str) {
-    // 1. Очищаем текущее состояние
     keyToValFreq.clear();
     freqToKeys.clear();
     keyToIterator.clear();
@@ -104,18 +102,20 @@ void LFUCache::deserialize(const std::string& str) {
     minFreq = 0;
     capacity = 0;
 
-    if (str.empty()) return;
-
+    if(str.empty()) return;
     std::stringstream ss(str);
+    size_t cap;
+    readSize(ss, cap);
+    capacity = static_cast<int>(cap);
+    size_t count;
+    readSize(ss, count);
 
-    // 2. Загружаем ёмкость
-    ss >> capacity;
-    if (capacity <= 0) return;
-
-    // 3. Загружаем тройки (ключ, значение, частота)
-    std::string key, val;
-    int freq;
-    while (ss >> key >> val >> freq) {
+    for(size_t i = 0; i < count; ++i) {
+        std::string key, val;
+        int freq;
+        readString(ss, key);
+        readString(ss, val);
+        readInt(ss, freq);
         internal_set(key, val, freq);
     }
 }

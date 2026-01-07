@@ -1,8 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"strings"
 )
 
 type Array struct {
@@ -64,13 +64,23 @@ func (a *Array) Clear() {
 }
 
 func (a *Array) Serialize() string {
-	return strings.Join(a.data, " ")
+	var buf bytes.Buffer
+	WriteSize(&buf, len(a.data))
+	for _, s := range a.data {
+		WriteString(&buf, s)
+	}
+	return buf.String()
 }
 
 func (a *Array) Deserialize(str string) {
+	a.Clear()
 	if str == "" {
-		a.data = make([]string, 0)
 		return
 	}
-	a.data = strings.Split(str, " ")
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		s, _ := ReadString(buf)
+		a.PushBack(s)
+	}
 }

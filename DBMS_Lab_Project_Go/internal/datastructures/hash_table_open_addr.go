@@ -1,9 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
-	"strings"
 )
 
 type State int
@@ -114,18 +113,15 @@ func (ht *HashTableOpenAddr) Clear() {
 }
 
 func (ht *HashTableOpenAddr) Serialize() string {
-	var sb strings.Builder
-	first := true
+	var buf bytes.Buffer
+	WriteSize(&buf, ht.numElements)
 	for _, entry := range ht.table {
 		if entry.State == ACTIVE {
-			if !first {
-				sb.WriteString(" ")
-			}
-			sb.WriteString(fmt.Sprintf("%s:%s", entry.Key, entry.Value))
-			first = false
+			WriteString(&buf, entry.Key)
+			WriteString(&buf, entry.Value)
 		}
 	}
-	return sb.String()
+	return buf.String()
 }
 
 func (ht *HashTableOpenAddr) Deserialize(str string) {
@@ -133,11 +129,11 @@ func (ht *HashTableOpenAddr) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	pairs := strings.Split(str, " ")
-	for _, p := range pairs {
-		kv := strings.SplitN(p, ":", 2)
-		if len(kv) == 2 {
-			ht.Put(kv[0], kv[1])
-		}
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		k, _ := ReadString(buf)
+		v, _ := ReadString(buf)
+		ht.Put(k, v)
 	}
 }

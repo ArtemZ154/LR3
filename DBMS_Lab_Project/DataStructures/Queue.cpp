@@ -1,6 +1,7 @@
 #include "Queue.h"
 #include <stdexcept>
 #include <sstream>
+#include "../BinaryUtils.h"
 
 // Определение внутреннего узла
 template<typename T>
@@ -66,9 +67,10 @@ bool Queue<T>::empty() const {
 template<typename T>
 std::string Queue<T>::serialize() const {
     std::stringstream ss;
+    writeSize(ss, count);
     Node* current = head.get();
     while (current) {
-        ss << current->data << (current->next ? " " : "");
+        writeValue(ss, current->data);
         current = current->next.get();
     }
     return ss.str();
@@ -83,9 +85,12 @@ void Queue<T>::deserialize(const std::string& str) {
     if (str.empty()) return;
 
     std::stringstream ss(str);
-    T item;
+    size_t size;
+    readSize(ss, size);
 
-    while (ss >> item) {
+    for(size_t i = 0; i < size; ++i) {
+        T item;
+        readValue(ss, item);
         push(item);
     }
 }

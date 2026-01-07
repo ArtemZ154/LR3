@@ -1,5 +1,6 @@
 #include "Stack.h"
 #include <sstream>
+#include "../BinaryUtils.h"
 #include <stdexcept>
 #include <vector>
 #include <algorithm> // для std::reverse
@@ -80,9 +81,10 @@ bool Stack<T>::empty() const {
 template<typename T>
 std::string Stack<T>::serialize() const {
     std::stringstream ss;
+    writeSize(ss, count);
     Node* current = head.get();
     while (current) {
-        ss << current->data << (current->next ? " " : "");
+        writeValue(ss, current->data);
         current = current->next.get();
     }
     return ss.str();
@@ -90,21 +92,21 @@ std::string Stack<T>::serialize() const {
 
 template<typename T>
 void Stack<T>::deserialize(const std::string& str) {
-    head.reset(); // Clear the current stack
+    head.reset();
     count = 0;
     if (str.empty()) return;
 
     Stack<T> temp_stack;
     std::stringstream ss(str);
-    T item;
+    size_t size;
+    readSize(ss, size);
 
-    // Read all items into a temporary stack
-    while (ss >> item) {
+    for (size_t i = 0; i < size; ++i) {
+        T item;
+        readValue(ss, item);
         temp_stack.push(item);
     }
 
-    // Move from temp_stack to this, reversing the order
-    // to match the original stack structure
     while (!temp_stack.empty()) {
         this->push(temp_stack.pop());
     }

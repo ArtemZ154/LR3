@@ -1,9 +1,9 @@
 package dbms
 
 import (
-	"bufio"
+	"dbms_lab_project/internal/datastructures"
+	"io"
 	"os"
-	"strings"
 )
 
 type StorageManager struct {
@@ -25,26 +25,36 @@ func (sm *StorageManager) Load(db *DBMS) error {
 	defer file.Close()
 
 	db.Clear()
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.SplitN(line, " ", 3)
-		if len(parts) < 2 {
-			continue
+	total, err := datastructures.ReadSize(file)
+	if err != nil {
+		if err == io.EOF {
+			return nil
 		}
-		typeStr := parts[0]
-		name := parts[1]
-		data := ""
-		if len(parts) == 3 {
-			data = parts[2]
-		}
+		return err
+	}
+
+	for i := 0; i < total; i++ {
+		typeStr, err := datastructures.ReadString(file)
+		if err != nil { return err }
+		name, err := datastructures.ReadString(file)
+		if err != nil { return err }
+		data, err := datastructures.ReadString(file)
+		if err != nil { return err }
 		db.LoadStructure(typeStr, name, data)
 	}
-	return scanner.Err()
+	return nil
 }
 
 func (sm *StorageManager) Save(db *DBMS) error {
 	file, err := os.Create(sm.filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(db.SerializeAll())
+	return err
+}
 	if err != nil {
 		return err
 	}

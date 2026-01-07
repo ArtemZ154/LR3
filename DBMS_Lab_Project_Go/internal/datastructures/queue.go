@@ -1,8 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"strings"
 )
 
 type Queue struct {
@@ -33,7 +33,12 @@ func (q *Queue) Empty() bool {
 }
 
 func (q *Queue) Serialize() string {
-	return strings.Join(q.data, " ")
+	var buf bytes.Buffer
+	WriteSize(&buf, len(q.data))
+	for _, v := range q.data {
+		WriteString(&buf, v)
+	}
+	return buf.String()
 }
 
 func (q *Queue) Deserialize(str string) {
@@ -41,8 +46,10 @@ func (q *Queue) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	parts := strings.Split(str, " ")
-	for _, p := range parts {
-		q.Push(p)
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		v, _ := ReadString(buf)
+		q.Push(v)
 	}
 }

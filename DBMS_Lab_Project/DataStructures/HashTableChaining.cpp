@@ -1,6 +1,7 @@
 #include "HashTableChaining.h"
 #include <stdexcept>
 #include <sstream>
+#include "../BinaryUtils.h"
 
 size_t HashTableChaining::manualHash(const std::string& key) const {
     size_t hash = 5381;
@@ -50,10 +51,14 @@ void HashTableChaining::remove(const std::string& key) {
 
 std::string HashTableChaining::serialize() const {
     std::stringstream ss;
+    size_t total = 0;
+    for(const auto& chain : table) total += chain.size();
+    writeSize(ss, total);
+
     for (const auto& chain : table) {
         for (const auto& pair : chain) {
-            // Формат: "key:value "
-            ss << pair.first << ":" << pair.second << " ";
+            writeString(ss, pair.first);
+            writeString(ss, pair.second);
         }
     }
     return ss.str();
@@ -62,14 +67,15 @@ std::string HashTableChaining::serialize() const {
 void HashTableChaining::deserialize(const std::string& str) {
     table.clear();
     table.resize(capacity);
+    if(str.empty()) return;
     std::stringstream ss(str);
-    std::string pair_str;
+    size_t count;
+    readSize(ss, count);
 
-    while (ss >> pair_str) {
-        size_t colon_pos = pair_str.find(':');
-        if (colon_pos == std::string::npos) continue;
-        std::string key = pair_str.substr(0, colon_pos);
-        std::string value = pair_str.substr(colon_pos + 1);
+    for(size_t i = 0; i < count; ++i) {
+        std::string key, value;
+        readString(ss, key);
+        readString(ss, value);
         put(key, value);
     }
 }

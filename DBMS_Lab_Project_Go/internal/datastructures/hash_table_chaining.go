@@ -1,9 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
-	"strings"
 )
 
 type KV struct {
@@ -67,31 +66,31 @@ func (ht *HashTableChaining) Remove(key string) {
 }
 
 func (ht *HashTableChaining) Serialize() string {
-	var sb strings.Builder
-	first := true
-	for _, bucket := range ht.table {
-		for _, kv := range bucket {
-			if !first {
-				sb.WriteString(" ")
-			}
-			sb.WriteString(fmt.Sprintf("%s:%s", kv.Key, kv.Value))
-			first = false
+	var buf bytes.Buffer
+	total := 0
+	for _, chain := range ht.table {
+		total += len(chain)
+	}
+	WriteSize(&buf, total)
+	for _, chain := range ht.table {
+		for _, kv := range chain {
+			WriteString(&buf, kv.Key)
+			WriteString(&buf, kv.Value)
 		}
 	}
-	return sb.String()
+	return buf.String()
 }
 
 func (ht *HashTableChaining) Deserialize(str string) {
-	// Clear table
 	ht.table = make([][]KV, ht.capacity)
 	if str == "" {
 		return
 	}
-	pairs := strings.Split(str, " ")
-	for _, p := range pairs {
-		kv := strings.SplitN(p, ":", 2)
-		if len(kv) == 2 {
-			ht.Put(kv[0], kv[1])
-		}
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		k, _ := ReadString(buf)
+		v, _ := ReadString(buf)
+		ht.Put(k, v)
 	}
 }

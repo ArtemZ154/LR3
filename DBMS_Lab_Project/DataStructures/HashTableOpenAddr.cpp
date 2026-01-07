@@ -1,6 +1,7 @@
 #include "HashTableOpenAddr.h"
 #include <stdexcept>
 #include <sstream>
+#include "../BinaryUtils.h"
 
 // --- Хеш-функция (DJB2) ---
 size_t HashTableOpenAddr::manualHash(const std::string& key) const {
@@ -133,10 +134,11 @@ void HashTableOpenAddr::clear() {
 
 std::string HashTableOpenAddr::serialize() const {
     std::stringstream ss;
+    writeSize(ss, numElements);
     for (size_t i = 0; i < capacity; ++i) {
         if (table[i].state == ACTIVE) {
-            // Формат: "key:value "
-            ss << table[i].key << ":" << table[i].value << " ";
+            writeString(ss, table[i].key);
+            writeString(ss, table[i].value);
         }
     }
     return ss.str();
@@ -144,14 +146,15 @@ std::string HashTableOpenAddr::serialize() const {
 
 void HashTableOpenAddr::deserialize(const std::string& str) {
     clear();
+    if(str.empty()) return;
     std::stringstream ss(str);
-    std::string pair_str;
+    size_t size;
+    readSize(ss, size);
 
-    while (ss >> pair_str) {
-        size_t colon_pos = pair_str.find(':');
-        if (colon_pos == std::string::npos) continue;
-        std::string key = pair_str.substr(0, colon_pos);
-        std::string value = pair_str.substr(colon_pos + 1);
+    for(size_t i = 0; i < size; ++i) {
+        std::string key, value;
+        readString(ss, key);
+        readString(ss, value);
         put(key, value);
     }
 }

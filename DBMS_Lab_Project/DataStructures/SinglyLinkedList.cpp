@@ -1,4 +1,5 @@
 #include "SinglyLinkedList.h"
+#include "../BinaryUtils.h"
 #include <sstream>
 #include <stdexcept>
 template<typename T> struct SinglyLinkedList<T>::Node {
@@ -82,14 +83,23 @@ template<typename T> T SinglyLinkedList<T>::pop_back() {
 
 template<typename T> std::string SinglyLinkedList<T>::serialize() const {
     std::stringstream ss;
-    for (Node* curr = head.get(); curr; curr = curr->next.get()) ss << curr->data << (curr->next ? " " : "");
+    writeSize(ss, count);
+    for (Node* curr = head.get(); curr; curr = curr->next.get()) {
+        writeValue(ss, curr->data);
+    }
     return ss.str();
 }
 template<typename T> void SinglyLinkedList<T>::deserialize(const std::string& str) {
     head.reset(); tail = nullptr; count = 0;
+    if (str.empty()) return;
     std::stringstream ss(str);
-    T item;
-    while (ss >> item) push_back(item);
+    size_t size;
+    readSize(ss, size);
+    for(size_t i = 0; i < size; ++i) {
+        T item;
+        readValue(ss, item);
+        push_back(item);
+    }
 }
 template<typename T>
 void SinglyLinkedList<T>::insert_after(const T& target_value, const T& new_value) {

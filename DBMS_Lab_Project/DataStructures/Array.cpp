@@ -1,5 +1,6 @@
 #include "Array.h"
 #include <sstream>
+#include "../BinaryUtils.h"
 #include <stdexcept>
 #include <algorithm>
 
@@ -138,8 +139,9 @@ void Array<T>::clear() {
 template<typename T>
 std::string Array<T>::serialize() const {
     std::stringstream ss;
+    writeSize(ss, current_size);
     for (size_t i = 0; i < current_size; ++i) {
-        ss << data[i] << (i == current_size - 1 ? "" : " ");
+        writeValue(ss, data[i]);
     }
     return ss.str();
 }
@@ -148,9 +150,14 @@ template<typename T>
 void Array<T>::deserialize(const std::string& str) {
     clear(); // --- ИЗМЕНЕНО: теперь используем clear() ---
 
+    if (str.empty()) return;
     std::stringstream ss(str);
-    T item;
-    while (ss >> item) {
+    size_t count = 0;
+    readSize(ss, count);
+
+    for(size_t i = 0; i < count; ++i) {
+        T item;
+        readValue(ss, item);
         push_back(item);
     }
 }

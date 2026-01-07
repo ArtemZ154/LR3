@@ -1,7 +1,7 @@
 package datastructures
 
 import (
-	"strings"
+	"bytes"
 )
 
 type Set struct {
@@ -143,18 +143,14 @@ func (s *Set) Difference(other *Set) *Set {
 }
 
 func (s *Set) Serialize() string {
-	var sb strings.Builder
-	first := true
+	var buf bytes.Buffer
+	WriteSize(&buf, s.numElements)
 	for _, entry := range s.table {
 		if entry.State == ACTIVE {
-			if !first {
-				sb.WriteString(" ")
-			}
-			sb.WriteString(entry.Value)
-			first = false
+			WriteString(&buf, entry.Value)
 		}
 	}
-	return sb.String()
+	return buf.String()
 }
 
 func (s *Set) Deserialize(str string) {
@@ -162,8 +158,10 @@ func (s *Set) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	parts := strings.Split(str, " ")
-	for _, p := range parts {
-		s.Add(p)
+	buf := bytes.NewBufferString(str)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		val, _ := ReadString(buf)
+		s.Add(val)
 	}
 }

@@ -1,8 +1,6 @@
 package datastructures
 
-import (
-	"strings"
-)
+import "bytes"
 
 type BTNode struct {
 	Data  string
@@ -76,24 +74,20 @@ func (t *FullBinaryTree) isFullRecursive(node *BTNode) bool {
 }
 
 func (t *FullBinaryTree) Serialize() string {
-	var sb strings.Builder
-	t.serializeRecursive(t.Root, 0, &sb)
-	res := sb.String()
-	if len(res) > 0 && res[len(res)-1] == '|' {
-		res = res[:len(res)-1]
+	var buf bytes.Buffer
+	var helper func(*BTNode)
+	helper = func(n *BTNode) {
+		if n == nil {
+			buf.WriteByte(0)
+			return
+		}
+		buf.WriteByte(1)
+		WriteString(&buf, n.Data)
+		helper(n.Left)
+		helper(n.Right)
 	}
-	return res
-}
-
-func (t *FullBinaryTree) serializeRecursive(node *BTNode, depth int, sb *strings.Builder) {
-	if node == nil {
-		return
-	}
-	sb.WriteString(strings.Repeat(".", depth))
-	sb.WriteString(node.Data)
-	sb.WriteString("|")
-	t.serializeRecursive(node.Left, depth+1, sb)
-	t.serializeRecursive(node.Right, depth+1, sb)
+	helper(t.Root)
+	return buf.String()
 }
 
 func (t *FullBinaryTree) Deserialize(str string) {
@@ -101,43 +95,18 @@ func (t *FullBinaryTree) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	lines := strings.Split(str, "|")
-	if len(lines) == 0 {
-		return
+	buf := bytes.NewBufferString(str)
+	var helper func() *BTNode
+	helper = func() *BTNode {
+		b, err := buf.ReadByte()
+		if err != nil || b == 0 {
+			return nil
+		}
+		val, _ := ReadString(buf)
+		node := &BTNode{Data: val}
+		node.Left = helper()
+		node.Right = helper()
+		return node
 	}
-
-	t.Root = &BTNode{Data: lines[0]} // First line has 0 dots
-	parentStack := []*BTNode{t.Root}
-
-	for i := 1; i < len(lines); i++ {
-		line := lines[i]
-		depth := 0
-		for j := 0; j < len(line); j++ {
-			if line[j] == '.' {
-				depth++
-			} else {
-				break
-			}
-		}
-		value := line[depth:]
-		newNode := &BTNode{Data: value}
-
-		if depth-1 < 0 || depth-1 >= len(parentStack) {
-			// Should not happen if serialized correctly
-			continue
-		}
-		parent := parentStack[depth-1]
-
-		if parent.Left == nil {
-			parent.Left = newNode
-		} else {
-			parent.Right = newNode
-		}
-
-		if len(parentStack) <= depth {
-			parentStack = append(parentStack, newNode)
-		} else {
-			parentStack[depth] = newNode
-		}
-	}
+	t.Root = helper()
 }

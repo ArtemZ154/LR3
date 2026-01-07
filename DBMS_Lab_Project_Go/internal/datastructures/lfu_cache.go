@@ -1,10 +1,8 @@
 package datastructures
 
 import (
+	"bytes"
 	"container/list"
-	"fmt"
-	"strconv"
-	"strings"
 )
 
 type ValFreq struct {
@@ -109,23 +107,18 @@ func (c *LFUCache) Set(key, value string) {
 }
 
 func (c *LFUCache) Serialize() string {
-	// Format: capacity|key:value:freq key2:value2:freq2 ...
-	var sb strings.Builder
-	sb.WriteString(strconv.Itoa(c.capacity))
-	sb.WriteString("|")
-	first := true
+	var buf bytes.Buffer
+	WriteInt(&buf, c.capacity)
+	WriteSize(&buf, len(c.keyToValFreq))
 	for key, vf := range c.keyToValFreq {
-		if !first {
-			sb.WriteString(" ")
-		}
-		sb.WriteString(fmt.Sprintf("%s:%s:%d", key, vf.Value, vf.Freq))
-		first = false
+		WriteString(&buf, key)
+		WriteString(&buf, vf.Value)
+		WriteInt(&buf, vf.Freq)
 	}
-	return sb.String()
+	return buf.String()
 }
 
 func (c *LFUCache) Deserialize(str string) {
-	// Clear
 	c.size = 0
 	c.minFreq = 0
 	c.keyToValFreq = make(map[string]ValFreq)
@@ -135,28 +128,14 @@ func (c *LFUCache) Deserialize(str string) {
 	if str == "" {
 		return
 	}
-	parts := strings.SplitN(str, "|", 2)
-	if len(parts) < 1 {
-		return
-	}
-	capVal, err := strconv.Atoi(parts[0])
-	if err == nil {
-		c.capacity = capVal
-	}
-
-	if len(parts) < 2 || parts[1] == "" {
-		return
-	}
-
-	items := strings.Split(parts[1], " ")
-	for _, item := range items {
-		kvf := strings.Split(item, ":")
-		if len(kvf) == 3 {
-			key := kvf[0]
-			val := kvf[1]
-			freq, _ := strconv.Atoi(kvf[2])
-			c.internalSet(key, val, freq)
-		}
+	buf := bytes.NewBufferString(str)
+	c.capacity, _ = ReadInt(buf)
+	count, _ := ReadSize(buf)
+	for i := 0; i < count; i++ {
+		key, _ := ReadString(buf)
+		val, _ := ReadString(buf)
+		freq, _ := ReadInt(buf)
+		c.internalSet(key, val, freq)
 	}
 }
 

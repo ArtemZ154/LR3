@@ -1,10 +1,9 @@
 package dbms
 
 import (
+	"bytes"
 	"dbms_lab_project/internal/datastructures"
-	"fmt"
 	"strconv"
-	"strings"
 )
 
 type DBMS struct {
@@ -94,38 +93,51 @@ func (db *DBMS) LoadStructure(typeStr, name, data string) {
 }
 
 func (db *DBMS) SerializeAll() string {
-	var sb strings.Builder
+	var buf bytes.Buffer
+	total := len(db.arrays) + len(db.singlyLists) + len(db.doublyLists) +
+		len(db.stacks) + len(db.queues) + len(db.trees) + len(db.sets) +
+		len(db.lfuCaches) + len(db.htChaining) + len(db.htOpenAddr)
+
+	datastructures.WriteSize(&buf, total)
+
+	save := func(name, typeStr, data string) {
+		datastructures.WriteString(&buf, typeStr)
+		datastructures.WriteString(&buf, name)
+		datastructures.WriteString(&buf, data)
+	}
+
 	for name, s := range db.arrays {
-		sb.WriteString(fmt.Sprintf("Array %s %s\n", name, s.Serialize()))
+		save(name, "Array", s.Serialize())
 	}
 	for name, s := range db.singlyLists {
-		sb.WriteString(fmt.Sprintf("SinglyLinkedList %s %s\n", name, s.Serialize()))
+		save(name, "SinglyLinkedList", s.Serialize())
 	}
 	for name, s := range db.doublyLists {
-		sb.WriteString(fmt.Sprintf("DoublyLinkedList %s %s\n", name, s.Serialize()))
+		save(name, "DoublyLinkedList", s.Serialize())
 	}
 	for name, s := range db.stacks {
-		sb.WriteString(fmt.Sprintf("Stack %s %s\n", name, s.Serialize()))
+		save(name, "Stack", s.Serialize())
 	}
 	for name, s := range db.queues {
-		sb.WriteString(fmt.Sprintf("Queue %s %s\n", name, s.Serialize()))
+		save(name, "Queue", s.Serialize())
 	}
 	for name, s := range db.trees {
-		sb.WriteString(fmt.Sprintf("FullBinaryTree %s %s\n", name, s.Serialize()))
+		save(name, "FullBinaryTree", s.Serialize())
 	}
 	for name, s := range db.sets {
-		sb.WriteString(fmt.Sprintf("Set %s %s\n", name, s.Serialize()))
+		save(name, "Set", s.Serialize())
 	}
 	for name, s := range db.lfuCaches {
-		sb.WriteString(fmt.Sprintf("LFUCache %s %s\n", name, s.Serialize()))
+		save(name, "LFUCache", s.Serialize())
 	}
 	for name, s := range db.htChaining {
-		sb.WriteString(fmt.Sprintf("HashTableChaining %s %s\n", name, s.Serialize()))
+		save(name, "HashTableChaining", s.Serialize())
 	}
 	for name, s := range db.htOpenAddr {
-		sb.WriteString(fmt.Sprintf("HashTableOpenAddr %s %s\n", name, s.Serialize()))
+		save(name, "HashTableOpenAddr", s.Serialize())
 	}
-	return sb.String()
+
+	return buf.String()
 }
 
 func (db *DBMS) Execute(command []string) string {
